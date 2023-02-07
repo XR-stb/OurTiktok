@@ -1,0 +1,18 @@
+[Server]
+IP = "192.168.1.103"
+Port = ":8080"
+
+[Mysql]
+dsn = "root:147258@tcp(127.0.0.1:3306)/fakedouyin?charset=utf8&parseTime=True&loc=Local"
+
+[Redis]
+IP = "127.0.0.1"
+Port = ":6379"
+
+[User]
+IP = "127.0.0.1"
+Port = ":2580"
+
+[Favorite]
+IP = "127.0.0.1"
+Port = ":2581"
