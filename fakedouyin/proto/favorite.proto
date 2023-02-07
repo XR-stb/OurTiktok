@@ -1,0 +1,22 @@
+syntax = "proto3";
+package service;
+option go_package = "../pkg/service";
+
+message VideoFavorite {
+  int64 VideoId = 1;
+  int64 Count = 2;
+  bool IsFavorite = 3;
+}
+
+message GetFavoriteReq {
+  int64 UsersId = 1;
+  repeated int64 VideosId = 2;
+}
+
+message GetFavoriteRes {
+  repeated VideoFavorite Favorites = 1;
+}
+
+service FavoriteService {
+  rpc GetFavorite (GetFavoriteReq) returns (GetFavoriteRes);
+}
