@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package publish;
+option go_package="./publish";
+
+enum Status {
+  OK = 0;
+  notOK = 1;
+}
+
+message UserInfo {
+  int64 Id = 1;
+  string Name = 2;
+  int64 FollowCount = 3;
+  int64 FollowerCount = 4;
+  bool IsFollow = 5;
+}
+
+message Video {
+  int64 Id = 1;
+  int64 AuthorId = 2;
+  UserInfo Author = 3;
+  string PlayUrl = 4;
+  string CoverUrl = 5;
+  int64 FavoriteCount = 6;
+  int64 CommentCount = 7;
+  bool IsFavorite = 8;
+  string Title = 9;
+}
+
+message ActionReq {
+  bytes Data = 1;
+  int64 UserId = 2;
+  string Title = 3;
+}
+
+message ActionRes {
+  Status Status = 1;
+}
+
+message ListReq {
+  int64 UserId = 1;
+  int64 ThisId = 2;
+}
+
+message ListRes {
+  Status Status = 1;
+  repeated Video VideoList = 2;
+}
+
+message GetVideosReq {
+  int64 UserId = 1;
+  repeated int64 VideoIds = 2;
+}
+
+message GetVideosRes {
+  Status Status = 1;
+  repeated Video VideoList = 2;
+}
+
+service Publish {
+  rpc Action(ActionReq) returns(ActionRes);
+  rpc List(ListReq) returns(ListRes);
+  rpc GetVideos(GetVideosReq) returns(GetVideosRes);
+}
