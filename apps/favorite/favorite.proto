@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package favorite;
+option go_package="./favorite";
+
+enum Status {
+  OK = 0;
+  notOK = 1;
+}
+
+message UserInfo {
+  int64 Id = 1;
+  string Name = 2;
+  int64 FollowCount = 3;
+  int64 FollowerCount = 4;
+  bool IsFollow = 5;
+}
+
+message Video {
+  int64 Id = 1;
+  UserInfo Author = 2;
+  string PlayUrl = 3;
+  string CoverUrl = 4;
+  int64 FavoriteCount = 5;
+  int64 CommentCount = 6;
+  bool IsFavorite = 7;
+  string Title = 8;
+}
+
+message FavoriteInfo {
+  int64 FavoriteCount = 1;
+  bool IsFavorite = 2;
+}
+
+message ActionReq {
+  int64 UserId = 1;
+  int64 VideoId = 2;
+  int32 ActionType = 3;
+}
+
+message ActionRes {
+  Status Status = 1;
+}
+
+message ListReq {
+  int64 UserId = 1;
+}
+
+message ListRes {
+  Status Status = 1;
+  repeated Video VideoList = 2;
+}
+
+service Favorite {
+  rpc Action(ActionReq) returns(ActionRes);
+  rpc List(ListReq) returns(ListRes);
+}

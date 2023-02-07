@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package user;
+option go_package="./user";
+
+enum Status {
+  OK = 0;
+  notOK = 1;
+}
+
+message UserInfo {
+  int64 Id = 1;
+  string Username = 2;
+  int64 FollowCount = 3;
+  int64 FollowerCount = 4;
+  bool IsFollow = 5;
+}
+
+message RegisterReq {
+  string Username = 1;
+  string Password = 2;
+}
+
+message RegisterRes {
+  Status Status = 1;
+  int64 UserId = 2;
+  string Token = 3;
+}
+
+message LoginReq {
+  string Username = 1;
+  string Password = 2;
+}
+
+message LoginRes {
+  Status Status = 1;
+  int64 UserId = 2;
+  string Token = 3;
+}
+
+message UserReq {
+  int64 UserId = 1;
+  int64 ThisId = 2;
+}
+
+message UserRes {
+  Status Status = 1;
+  UserInfo User = 2;
+}
+
+message GetUsersReq {
+  repeated int64 UserIds = 1;
+  int64 ThisId = 2;
+}
+
+message GetUsersRes {
+  repeated UserInfo Users = 1;
+}
+
+service User {
+  rpc Register(RegisterReq) returns(RegisterRes);
+  rpc Login(LoginReq) returns(LoginRes);
+  rpc User(UserReq) returns(UserRes);
+  rpc GetUsers(GetUsersReq) returns(GetUsersRes);
+}

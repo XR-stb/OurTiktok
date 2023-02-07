@@ -1,0 +1,229 @@
+syntax = "v1"
+
+info(
+	title: "gateway-api"
+	author: "baytan"
+	version: "0.1"
+)
+
+type (
+	Status {
+		StatusCode int32  `json:"status_code"`
+		StatusMsg  string `json:"status_msg"`
+	}
+
+	User {
+		Id            int64  `json:"id"`
+		Name          string `json:"name"`
+		FollowCount   int64  `json:"follow_count"`
+		FollowerCount int64  `json:"follower_count"`
+		IsFollow      bool   `json:"is_follow"`
+	}
+
+	Video {
+		Id            int64  `json:"id"`
+		Author        User   `json:"author"`
+		PlayUrl       string `json:"play_url"`
+		CoverUrl      string `json:"cover_url"`
+		FavoriteCount int64  `json:"favorite_count"`
+		CommentCount  int64  `json:"comment_count"`
+		IsFavorite    bool   `json:"is_favorite"`
+		Title         string `json:"title"`
+	}
+
+	Comment {
+		Id         int64  `json:"id"`
+		User       User   `json:"user"`
+		Content    string `json:"content"`
+		CreateTime string `json:"createTime"`
+	}
+)
+
+type (
+	feedReq {
+		LatestTime int64  `form:"latest_time"`
+		Token      string `form:"token"`
+	}
+
+	feedRes {
+		Status
+		NextTime  int64 `json:"next_time"`
+		VideoList Video `json:"video_list"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: feed
+)
+service gateway-api {
+	@doc (
+		summary: "视频流服务"
+	)
+	@handler FeedHandler
+	get /douyin/feed (feedReq) returns (feedRes)
+}
+
+type (
+	RegisterReq {
+		Username string `form:"username"`
+		Password string `form:"password"`
+	}
+
+	RegisterRes {
+		Status
+		UserId int64  `json:"user_id"`
+		Token  string `json:"token"`
+	}
+
+	LoginReq {
+		Username string `form:"username"`
+		Password string `form:"password"`
+	}
+
+	LoginRes {
+		Status
+		UserId int64  `json:"user_id"`
+		Token  string `json:"token"`
+	}
+
+	UserReq {
+		UserId int64  `form:"user_id"`
+		Token  string `form:"token"`
+	}
+
+	UserRes {
+		Status
+		User User `json:"user"`
+	}
+)
+
+@server (
+	group: user
+)
+service gateway-api {
+	@doc (
+		summary: "用户服务"
+	)
+	
+	@handler RegisterHandler
+	post /douyin/user/register (RegisterReq) returns(RegisterRes)
+	
+	@handler LoginHandler
+	post /douyin/user/login (LoginReq) returns(LoginRes)
+	
+	@handler UserHandler
+	get /douyin/user (UserReq) returns(UserRes)
+}
+
+type (
+	PublishActionReq {
+		Data  []byte `json:"data"`
+		Token string `json:"token"`
+		Title string `form:"title"`
+	}
+
+	PublishActionRes {
+		Status
+	}
+
+	PublishListReq {
+		Token  string `form:"token"`
+		UserId int64  `form:"user_id"`
+	}
+
+	PublishListRes {
+		Status
+		VideoList []Video `json:"video_list"`
+	}
+)
+
+@server (
+	group: publish
+)
+service gateway-api {
+	@doc (
+		summary: "视频服务"
+	)
+	
+	@handler PublishActionHandler
+	post /douyin/publish/action (PublishActionReq) returns (PublishActionRes)
+	
+	@handler PublishListHandler
+	get /douyin/publish/list (PublishListReq) returns (PublishListRes)
+}
+
+type (
+	FavoriteActionReq {
+		Token      string `form:"token"`
+		VideoId    int64  `form:"video_id"`
+		ActionType int32  `form:"action_type"`
+	}
+
+	FavoriteActionRes {
+		Status
+	}
+
+	FavoriteListReq {
+		UserId int64  `form:"userId"`
+		Token  string `form:"token"`
+	}
+
+	FavoriteListRes {
+		Status
+		VideoList []Video `json:"video_list"`
+	}
+)
+
+@server (
+	group: favorite
+)
+service gateway-api {
+	@doc (
+		summary: "点赞服务"
+	)
+	
+	@handler FavoriteActionHandler
+	post /douyin/favorite/action (FavoriteActionReq) returns (FavoriteActionRes)
+	
+	@handler FavoriteListHandler
+	get /douyin/favorite/list (FavoriteListReq) returns (FavoriteListRes)
+}
+
+type (
+	CommentActionReq {
+		Token      string `form:"token"`
+		VideoId    int64  `form:"video_id"`
+		ActionType int32  `form:"action_type""`
+	}
+
+	CommentActionRes {
+		Status
+		Comment Comment `json:"comment"`
+	}
+
+	CommentListReq {
+		Token   string `form:"token"`
+		VideoId int64  `form:"video_id"`
+	}
+
+	CommentListRes {
+		Status
+		CommentList []Comment `json:"comment_list"`
+	}
+)
+
+@server (
+	group: comment
+)
+service gateway-api {
+	@doc (
+		summary: "评论服务"
+	)
+	
+	@handler CommentActionHandler
+	post /douyin/comment/action (CommentActionReq) returns (CommentActionRes)
+	
+	@handler CommentListHandler
+	get /douyin/comment/list (CommentListReq) returns (CommentListRes)
+}
