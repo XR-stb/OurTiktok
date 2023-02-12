@@ -1,12 +1,12 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-
 	"OutTiktok/apps/gateway/internal/config"
 	"OutTiktok/apps/gateway/internal/handler"
 	"OutTiktok/apps/gateway/internal/svc"
+	"flag"
+	"fmt"
+	_ "github.com/zeromicro/zero-contrib/zrpc/registry/consul"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"

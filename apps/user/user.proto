@@ -24,7 +24,6 @@ message RegisterReq {
 message RegisterRes {
   Status Status = 1;
   int64 UserId = 2;
-  string Token = 3;
 }
 
 message LoginReq {
@@ -35,7 +34,6 @@ message LoginReq {
 message LoginRes {
   Status Status = 1;
   int64 UserId = 2;
-  string Token = 3;
 }
 
 message UserReq {

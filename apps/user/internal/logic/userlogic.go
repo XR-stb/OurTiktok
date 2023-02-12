@@ -24,7 +24,16 @@ func NewUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserLogic {
 }
 
 func (l *UserLogic) User(in *user.UserReq) (*user.UserRes, error) {
-	// todo: add your logic here and delete this line
+	res := &user.UserRes{}
+	userId := in.UserId
 
-	return &user.UserRes{}, nil
+	// 查询数据库
+	res.User = &user.UserInfo{}
+	result := l.svcCtx.DB.Table("users").Where("id=?", userId).First(res.User)
+	if result.Error != nil || result.RowsAffected < 1 {
+		res.Status = -1
+		return res, nil
+	}
+
+	return res, nil
 }
