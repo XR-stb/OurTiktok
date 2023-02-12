@@ -1,7 +1,10 @@
 package logic
 
 import (
+	"OutTiktok/dao"
 	"context"
+	"crypto/md5"
+	"fmt"
 
 	"OutTiktok/apps/user/internal/svc"
 	"OutTiktok/apps/user/user"
@@ -24,7 +27,20 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error) {
-	// todo: add your logic here and delete this line
+	username := in.Username
+	password := in.Password
+
+	// 将用户写入数据库
+	u := dao.User{
+		Username: username,
+		Password: fmt.Sprintf("%x", md5.Sum([]byte(password))), // md5加密
+	}
+	err := l.svcCtx.DB.Create(&u).Error
+	if err != nil {
+		return &user.RegisterRes{
+			Status: -1,
+		}, nil
+	}
 
 	return &user.RegisterRes{}, nil
 }

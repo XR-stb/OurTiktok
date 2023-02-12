@@ -53,7 +53,6 @@ type (
 )
 
 @server(
-	jwt: Auth
 	group: feed
 )
 service gateway-api {

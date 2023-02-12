@@ -24,7 +24,13 @@ func NewGetUsersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUsers
 }
 
 func (l *GetUsersLogic) GetUsers(in *user.GetUsersReq) (*user.GetUsersRes, error) {
-	// todo: add your logic here and delete this line
+	userIds := in.UserIds
 
-	return &user.GetUsersRes{}, nil
+	// 查询数据库
+	var users []*user.UserInfo
+	l.svcCtx.DB.Table("users").Where("id IN ?", userIds).Find(&users)
+
+	return &user.GetUsersRes{
+		Users: users,
+	}, nil
 }
