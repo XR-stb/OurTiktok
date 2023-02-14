@@ -53,7 +53,7 @@ func (l *PublishListLogic) PublishList(req *types.PublishListReq) (resp *types.P
 	resp.VideoList = make([]types.Video, len(r.VideoList))
 	for i := 0; i < len(r.VideoList); i++ {
 		resp.VideoList[i] = types.Video{}
-		copier.Copy(resp.VideoList[i], r.VideoList[i])
+		_ = copier.Copy(&resp.VideoList[i], r.VideoList[i])
 	}
 
 	return

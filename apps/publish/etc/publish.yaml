@@ -16,3 +16,9 @@ Minio:
 User:
   Target: consul://127.0.0.1:8500/user.rpc?wait=14s
   NonBlock: true
+Favorite:
+  Target: consul://127.0.0.1:8500/favorite.rpc?wait=14s
+  NonBlock: true
+Comment:
+  Target: consul://127.0.0.1:8500/comment.rpc?wait=14s
+  NonBlock: true

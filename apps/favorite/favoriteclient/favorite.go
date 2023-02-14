@@ -13,17 +13,20 @@ import (
 )
 
 type (
-	ActionReq    = favorite.ActionReq
-	ActionRes    = favorite.ActionRes
-	FavoriteInfo = favorite.FavoriteInfo
-	ListReq      = favorite.ListReq
-	ListRes      = favorite.ListRes
-	UserInfo     = favorite.UserInfo
-	Video        = favorite.Video
+	ActionReq       = favorite.ActionReq
+	ActionRes       = favorite.ActionRes
+	FavoriteInfo    = favorite.FavoriteInfo
+	GetFavoritesReq = favorite.GetFavoritesReq
+	GetFavoritesRes = favorite.GetFavoritesRes
+	ListReq         = favorite.ListReq
+	ListRes         = favorite.ListRes
+	UserInfo        = favorite.UserInfo
+	Video           = favorite.Video
 
 	Favorite interface {
 		Action(ctx context.Context, in *ActionReq, opts ...grpc.CallOption) (*ActionRes, error)
 		List(ctx context.Context, in *ListReq, opts ...grpc.CallOption) (*ListRes, error)
+		GetFavorites(ctx context.Context, in *GetFavoritesReq, opts ...grpc.CallOption) (*GetFavoritesRes, error)
 	}
 
 	defaultFavorite struct {
@@ -45,4 +48,9 @@ func (m *defaultFavorite) Action(ctx context.Context, in *ActionReq, opts ...grp
 func (m *defaultFavorite) List(ctx context.Context, in *ListReq, opts ...grpc.CallOption) (*ListRes, error) {
 	client := favorite.NewFavoriteClient(m.cli.Conn())
 	return client.List(ctx, in, opts...)
+}
+
+func (m *defaultFavorite) GetFavorites(ctx context.Context, in *GetFavoritesReq, opts ...grpc.CallOption) (*GetFavoritesRes, error) {
+	client := favorite.NewFavoriteClient(m.cli.Conn())
+	return client.GetFavorites(ctx, in, opts...)
 }

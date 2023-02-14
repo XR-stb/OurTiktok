@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"OutTiktok/apps/favorite/favoriteclient"
 	"OutTiktok/apps/user/userclient"
 	"context"
 	"github.com/jinzhu/copier"
@@ -47,7 +48,17 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 		for i := 0; i < rows; i++ {
 			userinfo := l.svcCtx.UserCache[videoList[i].AuthorId]
 			videoList[i].Author = &publish.UserInfo{}
-			copier.Copy(videoList[i].Author, userinfo)
+			_ = copier.Copy(videoList[i].Author, userinfo)
+		}
+	}
+
+	if r, err := l.svcCtx.FavoriteClient.GetFavorites(context.Background(), &favoriteclient.GetFavoritesReq{
+		UserId:   in.UserId,
+		VideoIds: videoIds,
+	}); err == nil {
+		for i := 0; i < rows; i++ {
+			videoList[i].FavoriteCount = r.Favorites[i].FavoriteCount
+			videoList[i].IsFavorite = r.Favorites[i].IsFavorite
 		}
 	}
 
