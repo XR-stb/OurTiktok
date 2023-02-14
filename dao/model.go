@@ -28,7 +28,7 @@ type Comment struct {
 	Id         int64     `gorm:"primaryKey;autoincrement"`
 	VideoId    int64     `gorm:"notnull;index"`
 	UserId     int64     `gorm:"notnull;"`
-	CreateTime time.Time `gorm:"notnull"`
+	CreateDate time.Time `gorm:"notnull"`
 	Content    string    `gorm:"notnull"`
 }
 

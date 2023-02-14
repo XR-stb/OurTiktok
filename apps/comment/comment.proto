@@ -18,17 +18,18 @@ message UserInfo {
 
 message CommentInfo {
   int64 Id = 1;
-  UserInfo UserInfo = 2;
-  string Content = 3;
-  string CreateDate = 4;
+  int64 UserId = 2;
+  UserInfo UserInfo = 3;
+  string Content = 4;
+  string CreateDate = 5;
 }
 
 message ActionReq {
   int64 UserId = 1;
-  string VideoId = 2;
+  int64 VideoId = 2;
   int32 ActionType = 3;
-  string CommentText = 4;
-  string CommentId = 5;
+  string Content = 4;
+  int64 CommentId = 5;
 }
 
 message ActionRes {

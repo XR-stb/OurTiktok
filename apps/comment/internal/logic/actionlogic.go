@@ -1,7 +1,9 @@
 package logic
 
 import (
+	"OutTiktok/dao"
 	"context"
+	"time"
 
 	"OutTiktok/apps/comment/comment"
 	"OutTiktok/apps/comment/internal/svc"
@@ -24,7 +26,25 @@ func NewActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ActionLogi
 }
 
 func (l *ActionLogic) Action(in *comment.ActionReq) (*comment.ActionRes, error) {
-	// todo: add your logic here and delete this line
+	newComment := &dao.Comment{
+		VideoId:    in.VideoId,
+		UserId:     in.UserId,
+		CreateDate: time.Now(),
+		Content:    in.Content,
+	}
 
-	return &comment.ActionRes{}, nil
+	if err := l.svcCtx.DB.Create(newComment).Error; err != nil {
+		return &comment.ActionRes{
+			Status: -1,
+		}, nil
+	}
+
+	return &comment.ActionRes{
+		CommentInfo: &comment.CommentInfo{
+			Id:         newComment.Id,
+			UserInfo:   nil,
+			Content:    in.Content,
+			CreateDate: newComment.CreateDate.Format("01-02"),
+		},
+	}, nil
 }
