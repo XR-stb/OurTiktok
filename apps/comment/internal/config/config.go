@@ -9,4 +9,5 @@ type Config struct {
 	zrpc.RpcServerConf
 	Consul   consul.Conf
 	MysqlDsn string
+	User     zrpc.RpcClientConf
 }

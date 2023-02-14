@@ -29,7 +29,7 @@ type Comment struct {
 	Id         int64  `json:"id"`
 	User       User   `json:"user"`
 	Content    string `json:"content"`
-	CreateTime string `json:"createTime"`
+	CreateDate string `json:"create_date"`
 }
 
 type FeedReq struct {
@@ -116,9 +116,11 @@ type FavoriteListRes struct {
 }
 
 type CommentActionReq struct {
-	Token      string `form:"token"`
-	VideoId    int64  `form:"video_id"`
-	ActionType int32  `form:"action_type""`
+	Token       string `form:"token"`
+	VideoId     int64  `form:"video_id"`
+	ActionType  int32  `form:"action_type"`
+	CommentText string `form:"comment_text"`
+	CommentId   int64  `form:"comment_id"`
 }
 
 type CommentActionRes struct {
