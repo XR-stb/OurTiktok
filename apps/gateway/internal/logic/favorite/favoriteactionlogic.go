@@ -1,6 +1,8 @@
 package favorite
 
 import (
+	"OutTiktok/apps/favorite/favorite"
+	"OutTiktok/apps/gateway/pkg/jwt"
 	"context"
 
 	"OutTiktok/apps/gateway/internal/svc"
@@ -24,7 +26,30 @@ func NewFavoriteActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Fa
 }
 
 func (l *FavoriteActionLogic) FavoriteAction(req *types.FavoriteActionReq) (resp *types.FavoriteActionRes, err error) {
-	// todo: add your logic here and delete this line
+	resp = &types.FavoriteActionRes{}
+	// 验证Token
+	claims, err := jwt.VerifyToken(req.Token)
+	if err != nil {
+		resp.StatusCode = -1
+		resp.StatusMsg = err.Error()
+		return
+	}
+
+	r, err := l.svcCtx.FavoriteClient.Action(context.Background(), &favorite.ActionReq{
+		UserId:     claims.UserId,
+		VideoId:    req.VideoId,
+		ActionType: req.ActionType,
+	})
+	if err != nil {
+		resp.StatusCode = -1
+		resp.StatusMsg = err.Error()
+		return
+	}
+	if r.Status != 0 {
+		resp.StatusCode = -1
+		resp.StatusMsg = "点赞失败"
+		return
+	}
 
 	return
 }

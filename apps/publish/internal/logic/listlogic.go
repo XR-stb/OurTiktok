@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"OutTiktok/apps/favorite/favoriteclient"
 	"OutTiktok/apps/user/userclient"
 	"context"
 	"github.com/jinzhu/copier"
@@ -40,11 +41,27 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 		userinfo := &publish.UserInfo{
 			Id: authorId,
 		}
-		copier.Copy(userinfo, r.Users[0])
+		_ = copier.Copy(userinfo, r.Users[0])
 		for i := 0; i < rows; i++ {
 			videoList[i].Author = userinfo
 		}
 	}
+
+	// 查询点赞信息
+	videoIds := make([]int64, rows)
+	for i := 0; i < rows; i++ {
+		videoIds[i] = videoList[i].Id
+	}
+	if r, err := l.svcCtx.FavoriteClient.GetFavorites(context.Background(), &favoriteclient.GetFavoritesReq{
+		UserId:   in.ThisId,
+		VideoIds: videoIds,
+	}); err == nil {
+		for i := 0; i < rows; i++ {
+			videoList[i].FavoriteCount = r.Favorites[i].FavoriteCount
+			videoList[i].IsFavorite = r.Favorites[i].IsFavorite
+		}
+	}
+
 	return &publish.ListRes{
 		VideoList: videoList,
 	}, nil

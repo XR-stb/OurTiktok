@@ -106,7 +106,7 @@ type FavoriteActionRes struct {
 }
 
 type FavoriteListReq struct {
-	UserId int64  `form:"userId"`
+	UserId int64  `form:"user_id"`
 	Token  string `form:"token"`
 }
 

@@ -31,3 +31,8 @@ func (s *FavoriteServer) List(ctx context.Context, in *favorite.ListReq) (*favor
 	l := logic.NewListLogic(ctx, s.svcCtx)
 	return l.List(in)
 }
+
+func (s *FavoriteServer) GetFavorites(ctx context.Context, in *favorite.GetFavoritesReq) (*favorite.GetFavoritesRes, error) {
+	l := logic.NewGetFavoritesLogic(ctx, s.svcCtx)
+	return l.GetFavorites(in)
+}

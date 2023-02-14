@@ -10,3 +10,6 @@ User:
 Publish:
   Target: consul://127.0.0.1:8500/publish.rpc?wait=14s
   NonBlock: true
+Favorite:
+  Target: consul://127.0.0.1:8500/favorite.rpc?wait=14s
+  NonBlock: true

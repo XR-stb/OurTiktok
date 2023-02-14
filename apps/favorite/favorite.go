@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/zeromicro/zero-contrib/zrpc/registry/consul"
+	"time"
 
 	"OutTiktok/apps/favorite/favorite"
 	"OutTiktok/apps/favorite/internal/config"
@@ -33,7 +35,11 @@ func main() {
 		}
 	})
 	defer s.Stop()
+	//将 rpc注册到consul
+	if err := consul.RegisterService(c.ListenOn, c.Consul); err != nil {
+		panic(err)
+	}
 
-	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
+	fmt.Printf("[%s] Starting rpc server at %s...\n", time.Now().Format("2006-01-02 15:04:05"), c.ListenOn)
 	s.Start()
 }

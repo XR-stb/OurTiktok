@@ -16,5 +16,6 @@ type Config struct {
 		VideoBucket string
 		CoverBucket string
 	}
-	User zrpc.RpcClientConf
+	User     zrpc.RpcClientConf
+	Favorite zrpc.RpcClientConf
 }

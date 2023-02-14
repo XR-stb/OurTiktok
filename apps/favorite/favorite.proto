@@ -10,7 +10,7 @@ enum Status {
 
 message UserInfo {
   int64 Id = 1;
-  string Name = 2;
+  string Username = 2;
   int64 FollowCount = 3;
   int64 FollowerCount = 4;
   bool IsFollow = 5;
@@ -44,6 +44,7 @@ message ActionRes {
 
 message ListReq {
   int64 UserId = 1;
+  int64 ThisId = 2;
 }
 
 message ListRes {
@@ -51,7 +52,18 @@ message ListRes {
   repeated Video VideoList = 2;
 }
 
+message GetFavoritesReq {
+  int64 UserId = 1;
+  repeated int64 VideoIds = 2;
+}
+
+message GetFavoritesRes {
+  Status Status = 1;
+  repeated FavoriteInfo Favorites = 2;
+}
+
 service Favorite {
   rpc Action(ActionReq) returns(ActionRes);
   rpc List(ListReq) returns(ListRes);
+  rpc GetFavorites(GetFavoritesReq) returns(GetFavoritesRes);
 }
