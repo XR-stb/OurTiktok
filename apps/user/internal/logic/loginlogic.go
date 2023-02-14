@@ -39,5 +39,7 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginRes, error) {
 		}, nil
 	}
 
-	return &user.LoginRes{}, nil
+	return &user.LoginRes{
+		UserId: u.Id,
+	}, nil
 }

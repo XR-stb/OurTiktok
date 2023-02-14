@@ -25,6 +25,9 @@ func GetToken(claims *JWTClaims) string {
 }
 
 func VerifyToken(token string) (*JWTClaims, error) {
+	if token == "" {
+		return nil, errors.New("empty token")
+	}
 	tokened, err := jwt.ParseWithClaims(token, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return secret, nil
 	})

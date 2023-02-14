@@ -31,7 +31,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginRes, err error
 	if req.Username == "" || req.Password == "" {
 		resp.StatusCode = -1
 		resp.StatusMsg = "用户名或密码为空"
-		return resp, nil
+		return
 	}
 
 	r, err := l.svcCtx.UserClient.Login(context.Background(), &user.LoginReq{
@@ -41,7 +41,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginRes, err error
 	if err != nil {
 		resp.StatusCode = -1
 		resp.StatusMsg = err.Error()
-		return resp, nil
+		return
 	}
 	if r.Status != 0 {
 		resp.StatusCode = -1

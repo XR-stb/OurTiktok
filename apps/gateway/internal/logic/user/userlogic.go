@@ -4,6 +4,7 @@ import (
 	"OutTiktok/apps/gateway/pkg/jwt"
 	"OutTiktok/apps/user/userclient"
 	"context"
+	"github.com/jinzhu/copier"
 
 	"OutTiktok/apps/gateway/internal/svc"
 	"OutTiktok/apps/gateway/internal/types"
@@ -34,10 +35,11 @@ func (l *UserLogic) User(req *types.UserReq) (resp *types.UserRes, err error) {
 		return
 	}
 
+	// 验证Token
 	var ThisId int64
 	claims, err := jwt.VerifyToken(req.Token)
 	if err == nil {
-		ThisId = int64(claims.UserId)
+		ThisId = claims.UserId
 	}
 
 	// 调用RPC服务
@@ -56,16 +58,6 @@ func (l *UserLogic) User(req *types.UserReq) (resp *types.UserRes, err error) {
 		return
 	}
 
-	resp.User = formatUser(r.User)
+	copier.Copy(&resp.User, &r.User)
 	return
-}
-
-func formatUser(info *userclient.UserInfo) types.User {
-	return types.User{
-		Id:            info.Id,
-		Name:          info.Username,
-		FollowCount:   info.FollowCount,
-		FollowerCount: info.FollowerCount,
-		IsFollow:      info.IsFollow,
-	}
 }

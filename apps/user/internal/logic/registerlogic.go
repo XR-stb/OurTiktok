@@ -42,5 +42,7 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error
 		}, nil
 	}
 
-	return &user.RegisterRes{}, nil
+	return &user.RegisterRes{
+		UserId: u.Id,
+	}, nil
 }

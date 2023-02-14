@@ -22,7 +22,7 @@
 
 ## 整体架构
 
-![架构图](/Users/baytan/go_project/OurTiktok/docs/架构图.jpg)
+![架构图](./docs/架构图.jpg)
 
 项目整体可分为八个模块：
 

@@ -10,7 +10,7 @@ enum Status {
 
 message UserInfo {
   int64 Id = 1;
-  string Name = 2;
+  string Username = 2;
   int64 FollowCount = 3;
   int64 FollowerCount = 4;
   bool IsFollow = 5;
