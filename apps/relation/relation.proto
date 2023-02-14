@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package relation;
+option go_package="./relation";
+
+enum Status {
+  OK = 0;
+  notOK = 1;
+}
+
+message UserInfo {
+  int64 Id = 1;
+  string Name = 2;
+  int64 FollowCount = 3;
+  int64 FollowerCount = 4;
+  bool IsFollow = 5;
+}
+
+message ActionReq {
+  int64 ThisId = 1;
+  int64 UserId = 2;
+  int32 ActionType = 3;
+}
+
+message ActionRes {
+  Status Status = 1;
+}
+
+message FollowListReq {
+  int64 ThisId = 1;
+  int64 UserId = 2;
+}
+
+message FollowListRes {
+  Status Status = 1;
+  repeated UserInfo Users = 2;
+}
+
+message FollowerListReq {
+  int64 ThisId = 1;
+  int64 UserId = 2;
+}
+
+message FollowerListRes {
+  Status Status = 1;
+  repeated UserInfo Users = 2;
+}
+
+message FriendListReq {
+  int64 ThisId = 1;
+  int64 UserId = 2;
+}
+
+message FriendListRes {
+  Status Status = 1;
+  repeated UserInfo Users = 2;
+}
+
+message GetRelationsReq {
+  int64 ThisId = 1;
+  repeated int64 UserIds = 2;
+}
+
+message GetRelationsRes {
+  Status Status = 1;
+  repeated UserInfo Users = 2;
+}
+
+service Relation {
+  rpc Action(ActionReq) returns(ActionRes);
+  rpc FollowList(FollowListReq) returns(FollowListRes);
+  rpc FollowerList(FollowerListReq) returns(FollowerListRes);
+  rpc FriendList(FriendListReq) returns(FriendListRes);
+  rpc GetRelations(GetRelationsReq) returns(GetRelationsRes);
+}
