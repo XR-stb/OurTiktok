@@ -24,7 +24,6 @@ func NewListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListLogic {
 }
 
 func (l *ListLogic) List(in *comment.ListReq) (*comment.ListRes, error) {
-	// todo: add your logic here and delete this line
 
 	return &comment.ListRes{}, nil
 }
