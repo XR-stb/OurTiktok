@@ -35,8 +35,7 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error
 		Username: username,
 		Password: fmt.Sprintf("%x", md5.Sum([]byte(password))), // md5加密
 	}
-	err := l.svcCtx.DB.Create(&u).Error
-	if err != nil {
+	if err := l.svcCtx.DB.Create(&u).Error; err != nil {
 		return &user.RegisterRes{
 			Status: -1,
 		}, nil
