@@ -1,7 +1,15 @@
 package logic
 
 import (
+	"OutTiktok/dao"
+	"bytes"
 	"context"
+	"fmt"
+	"github.com/minio/minio-go/v6"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
+	"io"
+	"os"
+	"time"
 
 	"OutTiktok/apps/publish/internal/svc"
 	"OutTiktok/apps/publish/publish"
@@ -24,7 +32,44 @@ func NewActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ActionLogi
 }
 
 func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) {
-	// todo: add your logic here and delete this line
+	filename := l.svcCtx.Sf.New() + ".mp4"
+
+	// 上传视频
+	reader := bytes.NewReader(in.Data)
+	if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.VideoBucket, filename, reader, reader.Size(), minio.PutObjectOptions{ContentType: "video/mp4"}); err != nil {
+		return &publish.ActionRes{Status: -1}, nil
+	}
+
+	// 上传缩略图
+	//reader2 := readFrameAsJpeg(l.svcCtx.Config.Minio.Host+"/videos/"+filename, 1)
+	//if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.CoverBucket, filename, reader2, reader.Size(), minio.PutObjectOptions{ContentType: "image/jpeg"}); err != nil {
+	//	return &publish.ActionRes{Status: -1}, nil
+	//}
+
+	// 写入数据库
+	video := dao.Video{
+		AuthorId:   in.UserId,
+		UploadTime: time.Now().UnixMilli(),
+		PlayUrl:    l.svcCtx.Config.Minio.Host + "/videos/" + filename,
+		CoverUrl:   l.svcCtx.Config.Minio.Host + "/covers/" + filename,
+		Title:      in.Title,
+	}
+	if l.svcCtx.DB.Create(&video).Error != nil {
+		return &publish.ActionRes{Status: -1}, nil
+	}
 
 	return &publish.ActionRes{}, nil
+}
+
+func readFrameAsJpeg(inFileName string, frameNum int) io.Reader {
+	buf := bytes.NewBuffer(nil)
+	err := ffmpeg.Input(inFileName).
+		Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", frameNum)}).
+		Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
+		WithOutput(buf, os.Stdout).
+		Run()
+	if err != nil {
+		panic(err)
+	}
+	return buf
 }

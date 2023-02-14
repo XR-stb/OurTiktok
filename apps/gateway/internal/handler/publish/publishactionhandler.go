@@ -12,10 +12,24 @@ import (
 func PublishActionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.PublishActionReq
-		if err := httpx.Parse(r, &req); err != nil {
+		//if err := httpx.Parse(r, &req); err != nil {
+		//	httpx.ErrorCtx(r.Context(), w, err)
+		//	return
+		//}
+
+		req.Title = r.FormValue("title")
+		req.Token = r.FormValue("token")
+		file, fileheader, err := r.FormFile("data")
+		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
-			return
 		}
+
+		data := make([]byte, fileheader.Size)
+		_, err = file.Read(data)
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+		}
+		req.Data = data
 
 		l := publish.NewPublishActionLogic(r.Context(), svcCtx)
 		resp, err := l.PublishAction(&req)

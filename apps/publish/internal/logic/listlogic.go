@@ -1,7 +1,9 @@
 package logic
 
 import (
+	"OutTiktok/apps/user/userclient"
 	"context"
+	"github.com/jinzhu/copier"
 
 	"OutTiktok/apps/publish/internal/svc"
 	"OutTiktok/apps/publish/publish"
@@ -24,7 +26,26 @@ func NewListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListLogic {
 }
 
 func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
-	// todo: add your logic here and delete this line
+	authorId := in.UserId
 
-	return &publish.ListRes{}, nil
+	// 查询数据库
+	var videoList []*publish.Video
+	rows := int(l.svcCtx.DB.Where("author_id=?", authorId).Find(&videoList).RowsAffected)
+
+	// 查询作者信息
+	if r, err := l.svcCtx.UserClient.GetUsers(context.Background(), &userclient.GetUsersReq{
+		ThisId:  in.ThisId,
+		UserIds: []int64{authorId},
+	}); err == nil {
+		userinfo := &publish.UserInfo{
+			Id: authorId,
+		}
+		copier.Copy(userinfo, r.Users[0])
+		for i := 0; i < rows; i++ {
+			videoList[i].Author = userinfo
+		}
+	}
+	return &publish.ListRes{
+		VideoList: videoList,
+	}, nil
 }

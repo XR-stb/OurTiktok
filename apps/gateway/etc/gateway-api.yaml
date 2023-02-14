@@ -7,3 +7,6 @@ Log:
 User:
   Target: consul://127.0.0.1:8500/user.rpc?wait=14s
   NonBlock: true
+Publish:
+  Target: consul://127.0.0.1:8500/publish.rpc?wait=14s
+  NonBlock: true
