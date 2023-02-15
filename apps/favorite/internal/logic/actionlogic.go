@@ -51,7 +51,7 @@ func (l *ActionLogic) Action(in *favorite.ActionReq) (*favorite.ActionRes, error
 	}
 
 	// 更新缓存
-	key := fmt.Sprintf("favoriteCount_%d", videoId)
+	key := fmt.Sprintf("fc_%d", videoId)
 	res, _ := l.svcCtx.Redis.Get(key)
 
 	if res == "" {

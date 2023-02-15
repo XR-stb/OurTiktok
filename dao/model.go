@@ -19,8 +19,8 @@ type Video struct {
 
 type Favorite struct {
 	Id      int64 `gorm:"primaryKey;autoincrement"`
-	VideoId int64 `gorm:"notnull;unique index:idx_vid_uid"`
-	UserId  int64 `gorm:"notnull;unique index:idx_vid_uid;index"`
+	VideoId int64 `gorm:"notnull;uniqueIndex:idx_vid_uid"`
+	UserId  int64 `gorm:"notnull;uniqueIndex:idx_vid_uid"`
 	Status  int32 `gorm:"notnull;type:enum('1','2')"` // 1-点赞 2-未点赞
 }
 
@@ -34,7 +34,7 @@ type Comment struct {
 
 type Relation struct {
 	Id         int64 `gorm:"primaryKey;autoincrement"`
-	FollowedId int64 `gorm:"notnull;unique index:idx_vid_uid"`       // 被关注
-	FollowerId int64 `gorm:"notnull;unique index:idx_vid_uid;index"` // 关注者
-	Status     int32 `gorm:"notnull;type:enum('1','2')"`             // 1-关注 2-未关注
+	FollowedId int64 `gorm:"notnull;uniqueIndex:idx_vid_uid"`       // 被关注
+	FollowerId int64 `gorm:"notnull;uniqueIndex:idx_vid_uid;index"` // 关注者
+	Status     int32 `gorm:"notnull;type:enum('1','2')"`            // 1-关注 2-未关注
 }
