@@ -8,6 +8,7 @@ import (
 	favorite "OutTiktok/apps/gateway/internal/handler/favorite"
 	feed "OutTiktok/apps/gateway/internal/handler/feed"
 	publish "OutTiktok/apps/gateway/internal/handler/publish"
+	relation "OutTiktok/apps/gateway/internal/handler/relation"
 	user "OutTiktok/apps/gateway/internal/handler/user"
 	"OutTiktok/apps/gateway/internal/svc"
 
@@ -86,6 +87,31 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/douyin/comment/list",
 				Handler: comment.CommentListHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/douyin/relation/action",
+				Handler: relation.RelationActionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/douyin/relation/follow/list",
+				Handler: relation.RelationFollowListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/douyin/relation/follower/list",
+				Handler: relation.RelationFollowerListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/douyin/relation/friend/list",
+				Handler: relation.RelationFriendListHandler(serverCtx),
 			},
 		},
 	)

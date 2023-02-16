@@ -32,17 +32,17 @@ func NewActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ActionLogi
 }
 
 func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) {
-	filename := l.svcCtx.Sf.New() + ".mp4"
+	filename := l.svcCtx.Sf.New()
 
 	// 上传视频
 	reader := bytes.NewReader(in.Data)
-	if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.VideoBucket, filename, reader, reader.Size(), minio.PutObjectOptions{ContentType: "video/mp4"}); err != nil {
+	if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.VideoBucket, filename+".mp4", reader, reader.Size(), minio.PutObjectOptions{ContentType: "video/mp4"}); err != nil {
 		return &publish.ActionRes{Status: -1}, nil
 	}
 
 	// 上传缩略图
 	//reader2 := readFrameAsJpeg(l.svcCtx.Config.Minio.Host+"/videos/"+filename, 1)
-	//if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.CoverBucket, filename, reader2, reader.Size(), minio.PutObjectOptions{ContentType: "image/jpeg"}); err != nil {
+	//if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.CoverBucket, filename+".jpg", reader2, reader.Size(), minio.PutObjectOptions{ContentType: "image/jpeg"}); err != nil {
 	//	return &publish.ActionRes{Status: -1}, nil
 	//}
 
@@ -50,8 +50,8 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 	video := dao.Video{
 		AuthorId:   in.UserId,
 		UploadTime: time.Now().UnixMilli(),
-		PlayUrl:    l.svcCtx.Config.Minio.Host + "/videos/" + filename,
-		CoverUrl:   l.svcCtx.Config.Minio.Host + "/covers/" + filename,
+		PlayUrl:    l.svcCtx.Config.Minio.Host + "/videos/" + filename + ".mp4",
+		CoverUrl:   l.svcCtx.Config.Minio.Host + "/covers/" + filename + ".jpg",
 		Title:      in.Title,
 	}
 	if l.svcCtx.DB.Create(&video).Error != nil {

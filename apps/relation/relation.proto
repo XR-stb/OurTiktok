@@ -10,10 +10,20 @@ enum Status {
 
 message UserInfo {
   int64 Id = 1;
-  string Name = 2;
+  string Username = 2;
   int64 FollowCount = 3;
   int64 FollowerCount = 4;
   bool IsFollow = 5;
+}
+
+message FriendUser {
+  int64 Id = 1;
+  string Username = 2;
+  int64 FollowCount = 3;
+  int64 FollowerCount = 4;
+  bool IsFollow = 5;
+  string Message = 6;
+  int32 MsgType = 7;
 }
 
 message ActionReq {
@@ -53,7 +63,7 @@ message FriendListReq {
 
 message FriendListRes {
   Status Status = 1;
-  repeated UserInfo Users = 2;
+  repeated FriendUser Users = 2;
 }
 
 message GetRelationsReq {

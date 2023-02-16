@@ -16,3 +16,6 @@ Favorite:
 Comment:
   Target: consul://127.0.0.1:8500/comment.rpc?wait=14s
   NonBlock: true
+Relation:
+  Target: consul://127.0.0.1:8500/relation.rpc?wait=14s
+  NonBlock: true

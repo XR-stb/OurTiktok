@@ -37,6 +37,12 @@ type (
 		Content    string `json:"content"`
 		CreateDate string `json:"create_date"`
 	}
+
+	FriendUser {
+		User
+		Message string `json:"message"`
+		MsgType int32  `json:"msg_type"`
+	}
 )
 
 type (
@@ -227,4 +233,67 @@ service gateway-api {
 	
 	@handler CommentListHandler
 	get /douyin/comment/list (CommentListReq) returns (CommentListRes)
+}
+
+type (
+	RelationActionReq {
+		Token      string `form:"token"`
+		ToUserId   int64  `form:"to_user_id"`
+		ActionType int32  `form:"action_type"`
+	}
+
+	RelationActionRes {
+		Status
+	}
+
+	RelationFollowListReq {
+		UserId int64  `form:"user_id"`
+		Token  string `form:"token"`
+	}
+
+	RelationFollowListRes {
+		Status
+		UserList []User `json:"user_list"`
+	}
+
+	RelationFollowerListReq {
+		UserId int64  `form:"user_id"`
+		Token  string `form:"token"`
+	}
+
+	RelationFollowerListRes {
+		Status
+		UserList []User `json:"user_list"`
+	}
+
+	RelationFriendListReq {
+		UserId int64  `form:"user_id"`
+		Token  string `form:"token"`
+	}
+
+	RelationFriendListRes {
+		Status
+		UserList []FriendUser `json:"user_list"`
+	}
+)
+
+@server (
+	group: relation
+)
+service gateway-api {
+	@doc(
+		summary: "关系服务"
+	)
+	
+	@handler RelationActionHandler
+	post /douyin/relation/action (RelationActionReq) returns (RelationActionRes)
+	
+	@handler RelationFollowListHandler
+	get /douyin/relation/follow/list (RelationFollowListReq) returns (RelationFollowListRes)
+	
+	@handler RelationFollowerListHandler
+	get /douyin/relation/follower/list (RelationFollowerListReq) returns (RelationFollowerListRes)
+	
+	@handler RelationFriendListHandler
+	get /douyin/relation/friend/list (RelationFriendListReq) returns (RelationFriendListRes)
 }

@@ -32,6 +32,12 @@ type Comment struct {
 	CreateDate string `json:"create_date"`
 }
 
+type FriendUser struct {
+	User
+	Message string `json:"message"`
+	MsgType int32  `json:"msg_type"`
+}
+
 type FeedReq struct {
 	LatestTime int64  `form:"latest_time"`
 	Token      string `form:"token"`
@@ -136,4 +142,44 @@ type CommentListReq struct {
 type CommentListRes struct {
 	Status
 	CommentList []Comment `json:"comment_list"`
+}
+
+type RelationActionReq struct {
+	Token      string `form:"token"`
+	ToUserId   int64  `form:"to_user_id"`
+	ActionType int32  `form:"action_type"`
+}
+
+type RelationActionRes struct {
+	Status
+}
+
+type RelationFollowListReq struct {
+	UserId int64  `form:"user_id"`
+	Token  string `form:"token"`
+}
+
+type RelationFollowListRes struct {
+	Status
+	UserList []User `json:"user_list"`
+}
+
+type RelationFollowerListReq struct {
+	UserId int64  `form:"user_id"`
+	Token  string `form:"token"`
+}
+
+type RelationFollowerListRes struct {
+	Status
+	UserList []User `json:"user_list"`
+}
+
+type RelationFriendListReq struct {
+	UserId int64  `form:"user_id"`
+	Token  string `form:"token"`
+}
+
+type RelationFriendListRes struct {
+	Status
+	UserList []FriendUser `json:"user_list"`
 }
