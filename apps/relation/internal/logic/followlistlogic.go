@@ -5,6 +5,7 @@ import (
 	"OutTiktok/apps/relation/relation"
 	"OutTiktok/apps/user/userclient"
 	"context"
+	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -38,13 +39,8 @@ func (l *FollowListLogic) FollowList(in *relation.FollowListReq) (*relation.Foll
 		ThisId:  thisId,
 	}); err == nil {
 		for i, user := range r.Users {
-			users[i] = &relation.UserInfo{
-				Id:            user.Id,
-				Name:          user.Username,
-				FollowCount:   user.FollowCount,
-				FollowerCount: user.FollowerCount,
-				IsFollow:      user.IsFollow,
-			}
+			users[i] = &relation.UserInfo{}
+			_ = copier.Copy(users[i], &user)
 		}
 	}
 

@@ -23,7 +23,6 @@ func NewFriendListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Friend
 
 // FriendList 获取好友列表
 func (l *FriendListLogic) FriendList(in *relation.FriendListReq) (*relation.FriendListRes, error) {
-	// todo: add your logic here and delete this line
 
 	return &relation.FriendListRes{}, nil
 }

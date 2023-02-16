@@ -11,4 +11,5 @@ type Config struct {
 	Publish  zrpc.RpcClientConf
 	Favorite zrpc.RpcClientConf
 	Comment  zrpc.RpcClientConf
+	Relation zrpc.RpcClientConf
 }

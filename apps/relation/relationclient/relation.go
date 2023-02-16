@@ -21,6 +21,7 @@ type (
 	FollowerListRes = relation.FollowerListRes
 	FriendListReq   = relation.FriendListReq
 	FriendListRes   = relation.FriendListRes
+	FriendUser      = relation.FriendUser
 	GetRelationsReq = relation.GetRelationsReq
 	GetRelationsRes = relation.GetRelationsRes
 	UserInfo        = relation.UserInfo
