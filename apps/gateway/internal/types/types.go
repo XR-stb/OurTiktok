@@ -45,8 +45,8 @@ type FeedReq struct {
 
 type FeedRes struct {
 	Status
-	NextTime  int64 `json:"next_time"`
-	VideoList Video `json:"video_list"`
+	NextTime  int64   `json:"next_time"`
+	VideoList []Video `json:"video_list"`
 }
 
 type RegisterReq struct {

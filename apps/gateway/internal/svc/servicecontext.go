@@ -5,6 +5,8 @@ import (
 	"OutTiktok/apps/comment/commentclient"
 	"OutTiktok/apps/favorite/favorite"
 	"OutTiktok/apps/favorite/favoriteclient"
+	"OutTiktok/apps/feed/feed"
+	"OutTiktok/apps/feed/feedclient"
 	"OutTiktok/apps/gateway/internal/config"
 	"OutTiktok/apps/publish/publish"
 	"OutTiktok/apps/publish/publishclient"
@@ -23,6 +25,7 @@ type ServiceContext struct {
 	FavoriteClient favorite.FavoriteClient
 	CommentClient  comment.CommentClient
 	RelationClient relation.RelationClient
+	FeedClient     feed.FeedClient
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -33,5 +36,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		FavoriteClient: favoriteclient.NewFavorite(zrpc.MustNewClient(c.Favorite, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
 		CommentClient:  commentclient.NewComment(zrpc.MustNewClient(c.Comment, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
 		RelationClient: relationclient.NewRelation(zrpc.MustNewClient(c.Relation, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
+		FeedClient:     feedclient.NewFeed(zrpc.MustNewClient(c.Feed, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
 	}
 }

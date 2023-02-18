@@ -98,7 +98,7 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 	}
 
 	// 查询评论数量
-	if r, err := l.svcCtx.CommentClient.GetCommentCount(context.Background(), &comment.GetCommentCountReq{VideoIds: videoIds}); err != nil {
+	if r, err := l.svcCtx.CommentClient.GetCommentCount(context.Background(), &comment.GetCommentCountReq{VideoIds: videoIds}); err == nil {
 		for i, count := range r.Counts {
 			videoList[i].CommentCount = count
 		}

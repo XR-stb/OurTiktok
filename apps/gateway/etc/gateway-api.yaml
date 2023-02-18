@@ -19,3 +19,6 @@ Comment:
 Relation:
   Target: consul://127.0.0.1:8500/relation.rpc?wait=14s
   NonBlock: true
+Feed:
+  Target: consul://127.0.0.1:8500/feed.rpc?wait=14s
+  NonBlock: true
