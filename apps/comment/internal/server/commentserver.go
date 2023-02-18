@@ -31,3 +31,8 @@ func (s *CommentServer) List(ctx context.Context, in *comment.ListReq) (*comment
 	l := logic.NewListLogic(ctx, s.svcCtx)
 	return l.List(in)
 }
+
+func (s *CommentServer) GetCommentCount(ctx context.Context, in *comment.GetCommentCountReq) (*comment.GetCommentCountRes, error) {
+	l := logic.NewGetCommentCountLogic(ctx, s.svcCtx)
+	return l.GetCommentCount(in)
+}

@@ -19,10 +19,9 @@ message UserInfo {
 message CommentInfo {
   int64 Id = 1;
   int64 UserId = 2;
-  UserInfo UserInfo = 3;
-  int64 VideoId = 4;
-  string Content = 5;
-  string CreateDate = 6;
+  UserInfo User = 3;
+  string Content = 4;
+  int64 CreateTime = 5;
 }
 
 message ActionReq {
@@ -48,7 +47,16 @@ message ListRes {
   repeated CommentInfo CommentList = 2;
 }
 
+message GetCommentCountReq {
+  repeated int64 VideoIds = 1;
+}
+
+message GetCommentCountRes {
+  repeated int64 Counts = 1;
+}
+
 service Comment {
   rpc Action(ActionReq) returns(ActionRes);
   rpc List(ListReq) returns(ListRes);
+  rpc GetCommentCount(GetCommentCountReq) returns(GetCommentCountRes);
 }

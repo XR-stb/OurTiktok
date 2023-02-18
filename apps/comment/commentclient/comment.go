@@ -13,16 +13,19 @@ import (
 )
 
 type (
-	ActionReq   = comment.ActionReq
-	ActionRes   = comment.ActionRes
-	CommentInfo = comment.CommentInfo
-	ListReq     = comment.ListReq
-	ListRes     = comment.ListRes
-	UserInfo    = comment.UserInfo
+	ActionReq          = comment.ActionReq
+	ActionRes          = comment.ActionRes
+	CommentInfo        = comment.CommentInfo
+	GetCommentCountReq = comment.GetCommentCountReq
+	GetCommentCountRes = comment.GetCommentCountRes
+	ListReq            = comment.ListReq
+	ListRes            = comment.ListRes
+	UserInfo           = comment.UserInfo
 
 	Comment interface {
 		Action(ctx context.Context, in *ActionReq, opts ...grpc.CallOption) (*ActionRes, error)
 		List(ctx context.Context, in *ListReq, opts ...grpc.CallOption) (*ListRes, error)
+		GetCommentCount(ctx context.Context, in *GetCommentCountReq, opts ...grpc.CallOption) (*GetCommentCountRes, error)
 	}
 
 	defaultComment struct {
@@ -44,4 +47,9 @@ func (m *defaultComment) Action(ctx context.Context, in *ActionReq, opts ...grpc
 func (m *defaultComment) List(ctx context.Context, in *ListReq, opts ...grpc.CallOption) (*ListRes, error) {
 	client := comment.NewCommentClient(m.cli.Conn())
 	return client.List(ctx, in, opts...)
+}
+
+func (m *defaultComment) GetCommentCount(ctx context.Context, in *GetCommentCountReq, opts ...grpc.CallOption) (*GetCommentCountRes, error) {
+	client := comment.NewCommentClient(m.cli.Conn())
+	return client.GetCommentCount(ctx, in, opts...)
 }

@@ -1,7 +1,5 @@
 package dao
 
-import "time"
-
 type User struct {
 	Id       int64  `gorm:"primaryKey;autoincrement"`
 	Username string `gorm:"size:32;uniqueIndex;notnull"`
@@ -10,11 +8,11 @@ type User struct {
 
 type Video struct {
 	Id         int64  `gorm:"primaryKey;autoincrement"`
-	AuthorId   int64  `gorm:"notnull"`
-	UploadTime int64  `gorm:"notnull;index"`
-	PlayUrl    string `gorm:"notnull;size:128" `
-	CoverUrl   string `gorm:"notnull;size:128" `
-	Title      string `gorm:"notnull;size:128" `
+	AuthorId   int64  `gorm:"notnull;index"`
+	UploadTime int64  `gorm:"notnull"`
+	PlayUrl    string `gorm:"notnull;size:128"`
+	CoverUrl   string `gorm:"notnull;size:128"`
+	Title      string `gorm:"notnull;size:128"`
 }
 
 type Favorite struct {
@@ -25,11 +23,11 @@ type Favorite struct {
 }
 
 type Comment struct {
-	Id         int64     `gorm:"primaryKey;autoincrement"`
-	VideoId    int64     `gorm:"notnull;index"`
-	UserId     int64     `gorm:"notnull"`
-	CreateDate time.Time `gorm:"notnull"`
-	Content    string    `gorm:"notnull"`
+	Id         int64  `gorm:"primaryKey;autoincrement"`
+	VideoId    int64  `gorm:"notnull;index"`
+	UserId     int64  `gorm:"notnull"`
+	CreateTime int64  `gorm:"notnull"`
+	Content    string `gorm:"notnull"`
 }
 
 type Relation struct {

@@ -72,8 +72,7 @@ message GetRelationsReq {
 }
 
 message GetRelationsRes {
-  Status Status = 1;
-  repeated UserInfo Users = 2;
+  repeated UserInfo Users = 1;
 }
 
 service Relation {
