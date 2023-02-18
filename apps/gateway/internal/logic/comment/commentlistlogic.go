@@ -7,6 +7,7 @@ import (
 	"OutTiktok/apps/gateway/pkg/jwt"
 	"context"
 	"github.com/jinzhu/copier"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -55,10 +56,10 @@ func (l *CommentListLogic) CommentList(req *types.CommentListReq) (resp *types.C
 		return
 	}
 
-	resp.StatusMsg = "成功"
 	resp.CommentList = make([]types.Comment, len(r.CommentList))
-	for i := 0; i < len(r.CommentList); i++ {
-		_ = copier.Copy(&resp.CommentList[i], r.CommentList[i])
+	for i, info := range r.CommentList {
+		_ = copier.Copy(&resp.CommentList[i], &info)
+		resp.CommentList[i].CreateDate = time.Unix(info.CreateTime, 0).Format("01-02")
 	}
 
 	return

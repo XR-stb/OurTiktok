@@ -1,10 +1,13 @@
 package logic
 
 import (
-	"context"
-
 	"OutTiktok/apps/feed/feed"
 	"OutTiktok/apps/feed/internal/svc"
+	"OutTiktok/apps/publish/publish"
+	"context"
+	"github.com/jinzhu/copier"
+	"math"
+	"strconv"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +27,39 @@ func NewFeedLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FeedLogic {
 }
 
 func (l *FeedLogic) Feed(in *feed.FeedReq) (*feed.FeedRes, error) {
-	// todo: add your logic here and delete this line
+	stop := in.LatestTime - 1
+	if in.LatestTime == 0 {
+		stop = math.MaxInt64
+	}
 
-	return &feed.FeedRes{}, nil
+	// 查询zset
+	pairs, err := l.svcCtx.Redis.ZrevrangebyscoreWithScoresAndLimit("feed", 0, stop, 0, 30)
+	if err != nil {
+		return &feed.FeedRes{Status: -1}, nil
+	}
+
+	videoIds := make([]int64, len(pairs))
+	for i, pair := range pairs {
+		id, _ := strconv.ParseInt(pair.Key, 10, 64)
+		videoIds[i] = id
+	}
+
+	r, err := l.svcCtx.PublishClient.GetVideos(context.Background(), &publish.GetVideosReq{
+		UserId:   in.UserId,
+		VideoIds: videoIds,
+	})
+	if err != nil || r.Status != 0 {
+		return &feed.FeedRes{Status: -1}, nil
+	}
+
+	videoList := make([]*feed.Video, len(videoIds))
+	for i, video := range r.VideoList {
+		videoList[i] = &feed.Video{}
+		_ = copier.Copy(videoList[i], &video)
+	}
+
+	return &feed.FeedRes{
+		NextTime:  pairs[len(pairs)-1].Score,
+		VideoList: videoList,
+	}, nil
 }

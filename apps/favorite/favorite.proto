@@ -58,8 +58,7 @@ message GetFavoritesReq {
 }
 
 message GetFavoritesRes {
-  Status Status = 1;
-  repeated FavoriteInfo Favorites = 2;
+  repeated FavoriteInfo Favorites = 1;
 }
 
 service Favorite {

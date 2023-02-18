@@ -6,9 +6,8 @@ Log:
 Consul:
   Host: 127.0.0.1:8500
   Key: feed.rpc
-#MysqlDsn: root:123456@tcp(host:port)/database?charset=utf8&parseTime=True&loc=Local
-#Redis:
-#  Host: 127.0.0.1:6379
-#Relation:
-#  Target: consul://127.0.0.1:8500/relation.rpc?wait=14s
-#  NonBlock: true
+Redis:
+  Host: 127.0.0.1:6379
+Publish:
+  Target: consul://127.0.0.1:8500/publish.rpc?wait=14s
+  NonBlock: true
