@@ -51,8 +51,8 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 	video := dao.Video{
 		AuthorId:   in.UserId,
 		UploadTime: time.Now().UnixMilli(),
-		PlayUrl:    l.svcCtx.Config.Minio.Host + "/videos/" + filename + ".mp4",
-		CoverUrl:   l.svcCtx.Config.Minio.Host + "/covers/" + filename + ".jpg",
+		PlayUrl:    "http://" + l.svcCtx.Config.Minio.Host + "/videos/" + filename + ".mp4",
+		CoverUrl:   "http://" + l.svcCtx.Config.Minio.Host + "/covers/" + filename + ".jpg",
 		Title:      in.Title,
 	}
 	if l.svcCtx.DB.Create(&video).Error != nil {

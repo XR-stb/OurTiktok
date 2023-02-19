@@ -33,9 +33,14 @@ message Video {
   string Title = 8;
 }
 
-message FavoriteInfo {
+message VideoFavorite {
   int64 FavoriteCount = 1;
   bool IsFavorite = 2;
+}
+
+message UserFavorite {
+  int64 FavoriteCount = 1;
+  int64 TotalFavorited = 2;
 }
 
 message ActionReq {
@@ -58,17 +63,27 @@ message ListRes {
   repeated Video VideoList = 2;
 }
 
-message GetFavoritesReq {
+message GetVideoFavoriteReq {
   int64 UserId = 1;
   repeated int64 VideoIds = 2;
+  bool AllFavorite = 3;
 }
 
-message GetFavoritesRes {
-  repeated FavoriteInfo Favorites = 1;
+message GetVideoFavoriteRes {
+  repeated VideoFavorite Favorites = 1;
+}
+
+message GetUserFavoriteReq {
+  repeated int64 users = 1;
+}
+
+message GetUserFavoriteRes {
+  repeated UserFavorite Favorites = 2;
 }
 
 service Favorite {
   rpc Action(ActionReq) returns(ActionRes);
   rpc List(ListReq) returns(ListRes);
-  rpc GetFavorites(GetFavoritesReq) returns(GetFavoritesRes);
+  rpc GetVideoFavorite(GetVideoFavoriteReq) returns(GetVideoFavoriteRes);
+  rpc GetUserFavorite(GetUserFavoriteReq) returns(GetUserFavoriteRes);
 }

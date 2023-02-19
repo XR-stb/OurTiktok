@@ -57,15 +57,24 @@ message ListRes {
 message GetVideosReq {
   int64 UserId = 1;
   repeated int64 VideoIds = 2;
+  bool AllFavorite = 3;
 }
 
 message GetVideosRes {
-  Status Status = 1;
-  repeated Video VideoList = 2;
+  repeated Video VideoList = 1;
+}
+
+message GetVideoIdsReq {
+  int64 UserId = 1;
+}
+
+message GetVideoIdsRes {
+  repeated int64 videoIds = 1;
 }
 
 service Publish {
   rpc Action(ActionReq) returns(ActionRes);
   rpc List(ListReq) returns(ListRes);
   rpc GetVideos(GetVideosReq) returns(GetVideosRes);
+  rpc GetVideoIds(GetVideoIdsReq) returns(GetVideoIdsRes);
 }

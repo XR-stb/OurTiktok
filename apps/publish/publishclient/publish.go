@@ -13,19 +13,22 @@ import (
 )
 
 type (
-	ActionReq    = publish.ActionReq
-	ActionRes    = publish.ActionRes
-	GetVideosReq = publish.GetVideosReq
-	GetVideosRes = publish.GetVideosRes
-	ListReq      = publish.ListReq
-	ListRes      = publish.ListRes
-	UserInfo     = publish.UserInfo
-	Video        = publish.Video
+	ActionReq      = publish.ActionReq
+	ActionRes      = publish.ActionRes
+	GetVideoIdsReq = publish.GetVideoIdsReq
+	GetVideoIdsRes = publish.GetVideoIdsRes
+	GetVideosReq   = publish.GetVideosReq
+	GetVideosRes   = publish.GetVideosRes
+	ListReq        = publish.ListReq
+	ListRes        = publish.ListRes
+	UserInfo       = publish.UserInfo
+	Video          = publish.Video
 
 	Publish interface {
 		Action(ctx context.Context, in *ActionReq, opts ...grpc.CallOption) (*ActionRes, error)
 		List(ctx context.Context, in *ListReq, opts ...grpc.CallOption) (*ListRes, error)
 		GetVideos(ctx context.Context, in *GetVideosReq, opts ...grpc.CallOption) (*GetVideosRes, error)
+		GetVideoIds(ctx context.Context, in *GetVideoIdsReq, opts ...grpc.CallOption) (*GetVideoIdsRes, error)
 	}
 
 	defaultPublish struct {
@@ -52,4 +55,9 @@ func (m *defaultPublish) List(ctx context.Context, in *ListReq, opts ...grpc.Cal
 func (m *defaultPublish) GetVideos(ctx context.Context, in *GetVideosReq, opts ...grpc.CallOption) (*GetVideosRes, error) {
 	client := publish.NewPublishClient(m.cli.Conn())
 	return client.GetVideos(ctx, in, opts...)
+}
+
+func (m *defaultPublish) GetVideoIds(ctx context.Context, in *GetVideoIdsReq, opts ...grpc.CallOption) (*GetVideoIdsRes, error) {
+	client := publish.NewPublishClient(m.cli.Conn())
+	return client.GetVideoIds(ctx, in, opts...)
 }

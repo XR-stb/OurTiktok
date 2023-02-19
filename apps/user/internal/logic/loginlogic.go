@@ -39,6 +39,11 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginRes, error) {
 		}, nil
 	}
 
+	// 写入缓存
+	key := fmt.Sprintf("uinfo_%d", u.Id)
+	val := fmt.Sprintf("%s_%s_%s_%s", u.Username, u.Avatar, u.BackgroundImage, u.Signature)
+	_ = l.svcCtx.Redis.Setex(key, val, 86400)
+
 	return &user.LoginRes{
 		UserId: u.Id,
 	}, nil

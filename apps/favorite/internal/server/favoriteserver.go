@@ -32,7 +32,12 @@ func (s *FavoriteServer) List(ctx context.Context, in *favorite.ListReq) (*favor
 	return l.List(in)
 }
 
-func (s *FavoriteServer) GetFavorites(ctx context.Context, in *favorite.GetFavoritesReq) (*favorite.GetFavoritesRes, error) {
-	l := logic.NewGetFavoritesLogic(ctx, s.svcCtx)
-	return l.GetFavorites(in)
+func (s *FavoriteServer) GetVideoFavorite(ctx context.Context, in *favorite.GetVideoFavoriteReq) (*favorite.GetVideoFavoriteRes, error) {
+	l := logic.NewGetVideoFavoriteLogic(ctx, s.svcCtx)
+	return l.GetVideoFavorite(in)
+}
+
+func (s *FavoriteServer) GetUserFavorite(ctx context.Context, in *favorite.GetUserFavoriteReq) (*favorite.GetUserFavoriteRes, error) {
+	l := logic.NewGetUserFavoriteLogic(ctx, s.svcCtx)
+	return l.GetUserFavorite(in)
 }

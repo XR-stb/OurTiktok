@@ -58,6 +58,6 @@ func (l *UserLogic) User(req *types.UserReq) (resp *types.UserRes, err error) {
 		return
 	}
 
-	copier.Copy(&resp.User, &r.User)
+	_ = copier.Copy(&resp.User, &r.User)
 	return
 }

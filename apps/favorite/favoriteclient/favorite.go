@@ -13,20 +13,24 @@ import (
 )
 
 type (
-	ActionReq       = favorite.ActionReq
-	ActionRes       = favorite.ActionRes
-	FavoriteInfo    = favorite.FavoriteInfo
-	GetFavoritesReq = favorite.GetFavoritesReq
-	GetFavoritesRes = favorite.GetFavoritesRes
-	ListReq         = favorite.ListReq
-	ListRes         = favorite.ListRes
-	UserInfo        = favorite.UserInfo
-	Video           = favorite.Video
+	ActionReq           = favorite.ActionReq
+	ActionRes           = favorite.ActionRes
+	GetUserFavoriteReq  = favorite.GetUserFavoriteReq
+	GetUserFavoriteRes  = favorite.GetUserFavoriteRes
+	GetVideoFavoriteReq = favorite.GetVideoFavoriteReq
+	GetVideoFavoriteRes = favorite.GetVideoFavoriteRes
+	ListReq             = favorite.ListReq
+	ListRes             = favorite.ListRes
+	UserFavorite        = favorite.UserFavorite
+	UserInfo            = favorite.UserInfo
+	Video               = favorite.Video
+	VideoFavorite       = favorite.VideoFavorite
 
 	Favorite interface {
 		Action(ctx context.Context, in *ActionReq, opts ...grpc.CallOption) (*ActionRes, error)
 		List(ctx context.Context, in *ListReq, opts ...grpc.CallOption) (*ListRes, error)
-		GetFavorites(ctx context.Context, in *GetFavoritesReq, opts ...grpc.CallOption) (*GetFavoritesRes, error)
+		GetVideoFavorite(ctx context.Context, in *GetVideoFavoriteReq, opts ...grpc.CallOption) (*GetVideoFavoriteRes, error)
+		GetUserFavorite(ctx context.Context, in *GetUserFavoriteReq, opts ...grpc.CallOption) (*GetUserFavoriteRes, error)
 	}
 
 	defaultFavorite struct {
@@ -50,7 +54,12 @@ func (m *defaultFavorite) List(ctx context.Context, in *ListReq, opts ...grpc.Ca
 	return client.List(ctx, in, opts...)
 }
 
-func (m *defaultFavorite) GetFavorites(ctx context.Context, in *GetFavoritesReq, opts ...grpc.CallOption) (*GetFavoritesRes, error) {
+func (m *defaultFavorite) GetVideoFavorite(ctx context.Context, in *GetVideoFavoriteReq, opts ...grpc.CallOption) (*GetVideoFavoriteRes, error) {
 	client := favorite.NewFavoriteClient(m.cli.Conn())
-	return client.GetFavorites(ctx, in, opts...)
+	return client.GetVideoFavorite(ctx, in, opts...)
+}
+
+func (m *defaultFavorite) GetUserFavorite(ctx context.Context, in *GetUserFavoriteReq, opts ...grpc.CallOption) (*GetUserFavoriteRes, error) {
+	client := favorite.NewFavoriteClient(m.cli.Conn())
+	return client.GetUserFavorite(ctx, in, opts...)
 }

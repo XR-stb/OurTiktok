@@ -113,7 +113,7 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 	}
 
 	// 查询点赞信息
-	if r, err := l.svcCtx.FavoriteClient.GetFavorites(context.Background(), &favoriteclient.GetFavoritesReq{
+	if r, err := l.svcCtx.FavoriteClient.GetVideoFavorite(context.Background(), &favoriteclient.GetVideoFavoriteReq{
 		UserId:   in.ThisId,
 		VideoIds: videoIds,
 	}); err == nil {

@@ -7,3 +7,7 @@ Consul:
   Host: 127.0.0.1:8500
   Key: user.rpc
 MysqlDsn: root:baytan123@tcp(127.0.0.1:3306)/fakedouyin?charset=utf8&parseTime=True&loc=Local
+Redis:
+  Host: 127.0.0.1:6379
+Minio:
+  Host: 116.62.164.8:9090
