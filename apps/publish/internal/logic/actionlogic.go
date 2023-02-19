@@ -64,7 +64,7 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 	key2 := fmt.Sprintf("uv_%d", in.UserId)
 	val := fmt.Sprintf("%d_%s_%s_%s", in.UserId, video.PlayUrl, video.CoverUrl, in.Title)
 	_ = l.svcCtx.Redis.Setex(key, val, 86400)
-	_, _ = l.svcCtx.Redis.Sadd(key2, video.Id) // 0占位
+	_, _ = l.svcCtx.Redis.Sadd(key2, 0, video.Id) // 0占位
 	_ = l.svcCtx.Redis.Expire(key2, 86400)
 	_, _ = l.svcCtx.Redis.Zadd("feed", video.UploadTime, strconv.FormatInt(video.Id, 10))
 

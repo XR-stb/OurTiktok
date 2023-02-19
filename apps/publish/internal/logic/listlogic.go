@@ -36,16 +36,17 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 	// 查询缓存
 	key := fmt.Sprintf("uv_%d", in.UserId)
 	result, err := l.svcCtx.Redis.Smembers(key)
+	l.Info(result)
 	videoIds := make([]int64, 0, len(result))
 	if err != nil || len(result) == 0 { // 未命中
 		// 查询数据库
 		l.svcCtx.DB.Where("author_id=?", authorId).Order("id desc").Find(&videoList)
 		// 写回缓存
-		videoIds := make([]interface{}, len(videoList))
-		videoIds[0] = 0
+		videoIds := make([]interface{}, len(videoList)+1)
 		for i, video := range videoList {
-			videoIds[i+1] = video.Id
+			videoIds[i] = video.Id
 		}
+		videoIds = append(videoIds, 0)
 		_, _ = l.svcCtx.Redis.Sadd(key, videoIds...)
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 		if len(videoList) == 0 {
@@ -123,7 +124,7 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 	}
 
 	// 查询评论数量
-	if r, err := l.svcCtx.CommentClient.GetCommentCount(context.Background(), &comment.GetCommentCountReq{VideoIds: videoIds}); err != nil {
+	if r, err := l.svcCtx.CommentClient.GetCommentCount(context.Background(), &comment.GetCommentCountReq{VideoIds: videoIds}); err == nil {
 		for i, count := range r.Counts {
 			videoList[i].CommentCount = count
 		}
