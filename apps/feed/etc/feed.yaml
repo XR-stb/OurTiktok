@@ -1,5 +1,5 @@
 Name: feed.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:8082
 Log:
   Encoding: plain
   TimeFormat: 2006-01-02 15:04:05.00

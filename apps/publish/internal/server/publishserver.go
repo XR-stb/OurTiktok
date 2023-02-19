@@ -41,3 +41,8 @@ func (s *PublishServer) GetVideoIds(ctx context.Context, in *publish.GetVideoIds
 	l := logic.NewGetVideoIdsLogic(ctx, s.svcCtx)
 	return l.GetVideoIds(in)
 }
+
+func (s *PublishServer) GetWorkCount(ctx context.Context, in *publish.GetWorkCountReq) (*publish.GetWorkCountRes, error) {
+	l := logic.NewGetWorkCountLogic(ctx, s.svcCtx)
+	return l.GetWorkCount(in)
+}

@@ -14,4 +14,7 @@ type Config struct {
 	Minio    struct {
 		Host string
 	}
+	Publish  zrpc.RpcClientConf
+	Favorite zrpc.RpcClientConf
+	Relation zrpc.RpcClientConf
 }

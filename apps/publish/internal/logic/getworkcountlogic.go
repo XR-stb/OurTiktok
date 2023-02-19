@@ -1,0 +1,47 @@
+package logic
+
+import (
+	"context"
+	"fmt"
+
+	"OutTiktok/apps/publish/internal/svc"
+	"OutTiktok/apps/publish/publish"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type GetWorkCountLogic struct {
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+	logx.Logger
+}
+
+func NewGetWorkCountLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetWorkCountLogic {
+	return &GetWorkCountLogic{
+		ctx:    ctx,
+		svcCtx: svcCtx,
+		Logger: logx.WithContext(ctx),
+	}
+}
+
+func (l *GetWorkCountLogic) GetWorkCount(in *publish.GetWorkCountReq) (*publish.GetWorkCountRes, error) {
+	counts := make([]int64, len(in.UserId))
+	for i, id := range in.UserId {
+		key := fmt.Sprintf("uv_%d", id)
+		count, err := l.svcCtx.Redis.Scard(key)
+		if err != nil || count == 0 {
+			var videoIds []int64
+			rows := l.svcCtx.DB.Table("videos").Select("id").Where("user_id = ?", id).Find(&videoIds).RowsAffected
+			videoIds = append(videoIds, 0)
+			_, _ = l.svcCtx.Redis.Sadd(key, videoIds)
+			counts[i] = rows
+		} else {
+			counts[i] = count - 1
+		}
+		_ = l.svcCtx.Redis.Expire(key, 86400)
+	}
+
+	return &publish.GetWorkCountRes{
+		Counts: counts,
+	}, nil
+}

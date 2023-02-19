@@ -11,3 +11,12 @@ Redis:
   Host: 127.0.0.1:6379
 Minio:
   Host: 116.62.164.8:9090
+Publish:
+  Target: consul://127.0.0.1:8500/publish.rpc?wait=14s
+  NonBlock: true
+Favorite:
+  Target: consul://127.0.0.1:8500/favorite.rpc?wait=14s
+  NonBlock: true
+Relation:
+  Target: consul://127.0.0.1:8500/relation.rpc?wait=14s
+  NonBlock: true

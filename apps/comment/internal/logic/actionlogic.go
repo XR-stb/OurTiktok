@@ -49,7 +49,7 @@ func (l *ActionLogic) Action(in *comment.ActionReq) (*comment.ActionRes, error) 
 		}
 
 		// 查询用户信息
-		var userinfo *comment.UserInfo
+		userinfo := &comment.UserInfo{}
 		r, err := l.svcCtx.UserClient.GetUsers(context.Background(), &user.GetUsersReq{
 			UserIds: []int64{in.UserId},
 			ThisId:  in.UserId,

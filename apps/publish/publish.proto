@@ -17,7 +17,7 @@ message UserInfo {
   string Avatar = 6;
   string BackgroundImage = 7;
   string Signature = 8;
-  string TotalFavorited = 9;
+  int64 TotalFavorited = 9;
   int64 WorkCount = 10;
   int64 FavoriteCount = 11;
 }
@@ -72,9 +72,18 @@ message GetVideoIdsRes {
   repeated int64 videoIds = 1;
 }
 
+message GetWorkCountReq {
+  repeated int64 UserId = 1;
+}
+
+message GetWorkCountRes {
+  repeated int64 counts = 2;
+}
+
 service Publish {
   rpc Action(ActionReq) returns(ActionRes);
   rpc List(ListReq) returns(ListRes);
   rpc GetVideos(GetVideosReq) returns(GetVideosRes);
   rpc GetVideoIds(GetVideoIdsReq) returns(GetVideoIdsRes);
+  rpc GetWorkCount(GetWorkCountReq) returns(GetWorkCountRes);
 }

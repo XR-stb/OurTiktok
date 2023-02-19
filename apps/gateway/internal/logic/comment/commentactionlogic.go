@@ -66,7 +66,6 @@ func (l *CommentActionLogic) CommentAction(req *types.CommentActionReq) (resp *t
 		return
 	}
 
-	resp.StatusMsg = "成功"
 	_ = copier.Copy(&resp.Comment, r.CommentInfo)
 	return
 }

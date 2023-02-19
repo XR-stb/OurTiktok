@@ -28,6 +28,7 @@ func NewGetUserFavoriteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 
 func (l *GetUserFavoriteLogic) GetUserFavorite(in *favorite.GetUserFavoriteReq) (*favorite.GetUserFavoriteRes, error) {
 	resList := make([]*favorite.UserFavorite, len(in.Users))
+
 	for i, id := range in.Users {
 		// 查询缓存
 		key := fmt.Sprintf("fv_%d", id)
@@ -38,9 +39,9 @@ func (l *GetUserFavoriteLogic) GetUserFavorite(in *favorite.GetUserFavoriteReq) 
 			rows := l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ? AND status = ?", id, 1).Find(&videoIds).RowsAffected
 			videoIds = append(videoIds, 0)
 			_, _ = l.svcCtx.Redis.Sadd(key, videoIds)
-			resList[i].FavoriteCount = rows
+			resList[i] = &favorite.UserFavorite{FavoriteCount: rows}
 		} else {
-			resList[i].FavoriteCount = count - 1
+			resList[i] = &favorite.UserFavorite{FavoriteCount: count - 1}
 		}
 
 		// 获取用户发布的视频ID
@@ -67,6 +68,7 @@ func (l *GetUserFavoriteLogic) GetUserFavorite(in *favorite.GetUserFavoriteReq) 
 		}
 		resList[i].TotalFavorited = totalfavorited
 	}
+
 	return &favorite.GetUserFavoriteRes{
 		Favorites: resList,
 	}, nil

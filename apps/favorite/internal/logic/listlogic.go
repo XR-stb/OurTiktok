@@ -43,10 +43,13 @@ func (l *ListLogic) List(in *favorite.ListReq) (*favorite.ListRes, error) {
 	} else if len(result) == 1 { // 命中为空
 		return &favorite.ListRes{}, nil
 	} else { // 命中
-		videoIds = make([]int64, len(result))
-		for i, id := range result {
+		videoIds = make([]int64, 0, len(result)-1)
+		for _, id := range result {
+			if id == "0" {
+				continue
+			}
 			id, _ := strconv.ParseInt(id, 10, 64)
-			videoIds[i] = id
+			videoIds = append(videoIds, id)
 		}
 	}
 

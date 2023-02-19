@@ -36,13 +36,13 @@ func (l *GetVideoIdsLogic) GetVideoIds(in *publish.GetVideoIdsReq) (*publish.Get
 		videoIds = append(videoIds, 0)
 		_, _ = l.svcCtx.Redis.Sadd(key, videoIds)
 	} else {
-		videoIds = make([]int64, len(members))
-		for i, id := range members {
+		videoIds = make([]int64, 0, len(members)-1)
+		for _, id := range members {
 			if id == "0" {
 				continue
 			}
 			id, _ := strconv.ParseInt(id, 10, 64)
-			videoIds[i] = id
+			videoIds = append(videoIds, id)
 		}
 	}
 	_ = l.svcCtx.Redis.Expire(key, 86400)

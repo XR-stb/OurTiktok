@@ -17,7 +17,7 @@ message UserInfo {
   string Avatar = 6;
   string BackgroundImage = 7;
   string Signature = 8;
-  string TotalFavorited = 9;
+  int64 TotalFavorited = 9;
   int64 WorkCount = 10;
   int64 FavoriteCount = 11;
 }

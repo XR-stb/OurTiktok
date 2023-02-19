@@ -26,6 +26,7 @@ type PublishClient interface {
 	List(ctx context.Context, in *ListReq, opts ...grpc.CallOption) (*ListRes, error)
 	GetVideos(ctx context.Context, in *GetVideosReq, opts ...grpc.CallOption) (*GetVideosRes, error)
 	GetVideoIds(ctx context.Context, in *GetVideoIdsReq, opts ...grpc.CallOption) (*GetVideoIdsRes, error)
+	GetWorkCount(ctx context.Context, in *GetWorkCountReq, opts ...grpc.CallOption) (*GetWorkCountRes, error)
 }
 
 type publishClient struct {
@@ -72,6 +73,15 @@ func (c *publishClient) GetVideoIds(ctx context.Context, in *GetVideoIdsReq, opt
 	return out, nil
 }
 
+func (c *publishClient) GetWorkCount(ctx context.Context, in *GetWorkCountReq, opts ...grpc.CallOption) (*GetWorkCountRes, error) {
+	out := new(GetWorkCountRes)
+	err := c.cc.Invoke(ctx, "/publish.Publish/GetWorkCount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PublishServer is the server API for Publish service.
 // All implementations must embed UnimplementedPublishServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type PublishServer interface {
 	List(context.Context, *ListReq) (*ListRes, error)
 	GetVideos(context.Context, *GetVideosReq) (*GetVideosRes, error)
 	GetVideoIds(context.Context, *GetVideoIdsReq) (*GetVideoIdsRes, error)
+	GetWorkCount(context.Context, *GetWorkCountReq) (*GetWorkCountRes, error)
 	mustEmbedUnimplementedPublishServer()
 }
 
@@ -98,6 +109,9 @@ func (UnimplementedPublishServer) GetVideos(context.Context, *GetVideosReq) (*Ge
 }
 func (UnimplementedPublishServer) GetVideoIds(context.Context, *GetVideoIdsReq) (*GetVideoIdsRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVideoIds not implemented")
+}
+func (UnimplementedPublishServer) GetWorkCount(context.Context, *GetWorkCountReq) (*GetWorkCountRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkCount not implemented")
 }
 func (UnimplementedPublishServer) mustEmbedUnimplementedPublishServer() {}
 
@@ -184,6 +198,24 @@ func _Publish_GetVideoIds_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Publish_GetWorkCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkCountReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublishServer).GetWorkCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/publish.Publish/GetWorkCount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublishServer).GetWorkCount(ctx, req.(*GetWorkCountReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Publish_ServiceDesc is the grpc.ServiceDesc for Publish service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +238,10 @@ var Publish_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetVideoIds",
 			Handler:    _Publish_GetVideoIds_Handler,
+		},
+		{
+			MethodName: "GetWorkCount",
+			Handler:    _Publish_GetWorkCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

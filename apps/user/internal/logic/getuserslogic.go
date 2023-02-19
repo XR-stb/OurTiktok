@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"OutTiktok/apps/favorite/favorite"
+	"OutTiktok/apps/publish/publish"
 	"context"
 	"fmt"
 
@@ -55,7 +57,20 @@ func (l *GetUsersLogic) GetUsers(in *user.GetUsersReq) (*user.GetUsersRes, error
 		users = append(users, queryUsers...)
 	}
 
-	//TODO: 获取点赞信息
+	// 获取点赞信息
+	if r, err := l.svcCtx.FavoriteClient.GetUserFavorite(context.Background(), &favorite.GetUserFavoriteReq{Users: in.UserIds}); err == nil {
+		for i, Favorite := range r.Favorites {
+			users[i].FavoriteCount = Favorite.FavoriteCount
+			users[i].TotalFavorited = Favorite.TotalFavorited
+		}
+	}
+
+	// 获取发布数量
+	if r, err := l.svcCtx.PublishClient.GetWorkCount(context.Background(), &publish.GetWorkCountReq{UserId: in.UserIds}); err == nil {
+		for i, count := range r.Counts {
+			users[i].WorkCount = count
+		}
+	}
 
 	//TODO: 获取关注信息
 
