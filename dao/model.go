@@ -1,9 +1,12 @@
 package dao
 
 type User struct {
-	Id       int64  `gorm:"primaryKey;autoincrement"`
-	Username string `gorm:"size:32;uniqueIndex;notnull"`
-	Password string `gorm:"size:32;notnull"`
+	Id              int64  `gorm:"primaryKey;autoincrement"`
+	Username        string `gorm:"notnull;size:32;uniqueIndex"`
+	Password        string `gorm:"notnull;size:32"`
+	Avatar          string `gorm:"notnull;size:128"`
+	BackgroundImage string `gorm:"notnull;size:128"`
+	Signature       string `gorm:"notnull;size:128"`
 }
 
 type Video struct {

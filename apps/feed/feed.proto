@@ -10,10 +10,16 @@ enum Status {
 
 message UserInfo {
   int64 Id = 1;
-  string Name = 2;
+  string Username = 2;
   int64 FollowCount = 3;
   int64 FollowerCount = 4;
   bool IsFollow = 5;
+  string Avatar = 6;
+  string BackgroundImage = 7;
+  string Signature = 8;
+  string TotalFavorited = 9;
+  int64 WorkCount = 10;
+  int64 FavoriteCount = 11;
 }
 
 message Video {
