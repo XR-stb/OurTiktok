@@ -24,7 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type FavoriteClient interface {
 	Action(ctx context.Context, in *ActionReq, opts ...grpc.CallOption) (*ActionRes, error)
 	List(ctx context.Context, in *ListReq, opts ...grpc.CallOption) (*ListRes, error)
-	GetFavorites(ctx context.Context, in *GetFavoritesReq, opts ...grpc.CallOption) (*GetFavoritesRes, error)
+	GetVideoFavorite(ctx context.Context, in *GetVideoFavoriteReq, opts ...grpc.CallOption) (*GetVideoFavoriteRes, error)
+	GetUserFavorite(ctx context.Context, in *GetUserFavoriteReq, opts ...grpc.CallOption) (*GetUserFavoriteRes, error)
 }
 
 type favoriteClient struct {
@@ -53,9 +54,18 @@ func (c *favoriteClient) List(ctx context.Context, in *ListReq, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *favoriteClient) GetFavorites(ctx context.Context, in *GetFavoritesReq, opts ...grpc.CallOption) (*GetFavoritesRes, error) {
-	out := new(GetFavoritesRes)
-	err := c.cc.Invoke(ctx, "/favorite.Favorite/GetFavorites", in, out, opts...)
+func (c *favoriteClient) GetVideoFavorite(ctx context.Context, in *GetVideoFavoriteReq, opts ...grpc.CallOption) (*GetVideoFavoriteRes, error) {
+	out := new(GetVideoFavoriteRes)
+	err := c.cc.Invoke(ctx, "/favorite.Favorite/GetVideoFavorite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *favoriteClient) GetUserFavorite(ctx context.Context, in *GetUserFavoriteReq, opts ...grpc.CallOption) (*GetUserFavoriteRes, error) {
+	out := new(GetUserFavoriteRes)
+	err := c.cc.Invoke(ctx, "/favorite.Favorite/GetUserFavorite", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +78,8 @@ func (c *favoriteClient) GetFavorites(ctx context.Context, in *GetFavoritesReq, 
 type FavoriteServer interface {
 	Action(context.Context, *ActionReq) (*ActionRes, error)
 	List(context.Context, *ListReq) (*ListRes, error)
-	GetFavorites(context.Context, *GetFavoritesReq) (*GetFavoritesRes, error)
+	GetVideoFavorite(context.Context, *GetVideoFavoriteReq) (*GetVideoFavoriteRes, error)
+	GetUserFavorite(context.Context, *GetUserFavoriteReq) (*GetUserFavoriteRes, error)
 	mustEmbedUnimplementedFavoriteServer()
 }
 
@@ -82,8 +93,11 @@ func (UnimplementedFavoriteServer) Action(context.Context, *ActionReq) (*ActionR
 func (UnimplementedFavoriteServer) List(context.Context, *ListReq) (*ListRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedFavoriteServer) GetFavorites(context.Context, *GetFavoritesReq) (*GetFavoritesRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFavorites not implemented")
+func (UnimplementedFavoriteServer) GetVideoFavorite(context.Context, *GetVideoFavoriteReq) (*GetVideoFavoriteRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVideoFavorite not implemented")
+}
+func (UnimplementedFavoriteServer) GetUserFavorite(context.Context, *GetUserFavoriteReq) (*GetUserFavoriteRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserFavorite not implemented")
 }
 func (UnimplementedFavoriteServer) mustEmbedUnimplementedFavoriteServer() {}
 
@@ -134,20 +148,38 @@ func _Favorite_List_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Favorite_GetFavorites_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFavoritesReq)
+func _Favorite_GetVideoFavorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetVideoFavoriteReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FavoriteServer).GetFavorites(ctx, in)
+		return srv.(FavoriteServer).GetVideoFavorite(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/favorite.Favorite/GetFavorites",
+		FullMethod: "/favorite.Favorite/GetVideoFavorite",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FavoriteServer).GetFavorites(ctx, req.(*GetFavoritesReq))
+		return srv.(FavoriteServer).GetVideoFavorite(ctx, req.(*GetVideoFavoriteReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Favorite_GetUserFavorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserFavoriteReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FavoriteServer).GetUserFavorite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/favorite.Favorite/GetUserFavorite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FavoriteServer).GetUserFavorite(ctx, req.(*GetUserFavoriteReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -168,8 +200,12 @@ var Favorite_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Favorite_List_Handler,
 		},
 		{
-			MethodName: "GetFavorites",
-			Handler:    _Favorite_GetFavorites_Handler,
+			MethodName: "GetVideoFavorite",
+			Handler:    _Favorite_GetVideoFavorite_Handler,
+		},
+		{
+			MethodName: "GetUserFavorite",
+			Handler:    _Favorite_GetUserFavorite_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

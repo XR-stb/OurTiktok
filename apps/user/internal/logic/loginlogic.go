@@ -33,11 +33,16 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginRes, error) {
 	// 查询账号并验证密码
 	u := dao.User{}
 	password = fmt.Sprintf("%x", md5.Sum([]byte(password)))
-	if err := l.svcCtx.DB.Select("Id").Where("username=? AND password=?", username, password).First(&u).Error; err != nil {
+	if err := l.svcCtx.DB.Where("username=? AND password=?", username, password).Find(&u).Error; err != nil {
 		return &user.LoginRes{
 			Status: -1,
 		}, nil
 	}
+
+	// 写入缓存
+	key := fmt.Sprintf("uinfo_%d", u.Id)
+	val := fmt.Sprintf("%s_%s_%s_%s", u.Username, u.Avatar, u.BackgroundImage, u.Signature)
+	_ = l.svcCtx.Redis.Setex(key, val, 86400)
 
 	return &user.LoginRes{
 		UserId: u.Id,

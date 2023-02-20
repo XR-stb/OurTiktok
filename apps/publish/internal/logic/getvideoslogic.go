@@ -87,9 +87,10 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 	}
 
 	// 查询点赞信息
-	if r, err := l.svcCtx.FavoriteClient.GetFavorites(context.Background(), &favoriteclient.GetFavoritesReq{
-		UserId:   in.UserId,
-		VideoIds: videoIds,
+	if r, err := l.svcCtx.FavoriteClient.GetVideoFavorite(context.Background(), &favoriteclient.GetVideoFavoriteReq{
+		UserId:      in.UserId,
+		VideoIds:    videoIds,
+		AllFavorite: in.AllFavorite,
 	}); err == nil {
 		for i := 0; i < len(videoList); i++ {
 			videoList[i].FavoriteCount = r.Favorites[i].FavoriteCount

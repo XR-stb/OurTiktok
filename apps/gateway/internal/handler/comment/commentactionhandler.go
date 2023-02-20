@@ -12,10 +12,11 @@ import (
 func CommentActionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.CommentActionReq
-		if err := httpx.Parse(r, &req); err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-			return
-		}
+		//if err := httpx.Parse(r, &req); err != nil {
+		//	httpx.ErrorCtx(r.Context(), w, err)
+		//	return
+		//}
+		_ = httpx.Parse(r, &req)
 
 		l := comment.NewCommentActionLogic(r.Context(), svcCtx)
 		resp, err := l.CommentAction(&req)

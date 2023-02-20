@@ -37,6 +37,9 @@ func (l *FeedLogic) Feed(in *feed.FeedReq) (*feed.FeedRes, error) {
 	if err != nil {
 		return &feed.FeedRes{Status: -1}, nil
 	}
+	if len(pairs) == 0 {
+		return &feed.FeedRes{}, nil
+	}
 
 	videoIds := make([]int64, len(pairs))
 	for i, pair := range pairs {
@@ -48,7 +51,7 @@ func (l *FeedLogic) Feed(in *feed.FeedReq) (*feed.FeedRes, error) {
 		UserId:   in.UserId,
 		VideoIds: videoIds,
 	})
-	if err != nil || r.Status != 0 {
+	if err != nil {
 		return &feed.FeedRes{Status: -1}, nil
 	}
 

@@ -36,7 +36,6 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 	// 查询缓存
 	key := fmt.Sprintf("uv_%d", in.UserId)
 	result, err := l.svcCtx.Redis.Smembers(key)
-	l.Info(result)
 	videoIds := make([]int64, 0, len(result))
 	if err != nil || len(result) == 0 { // 未命中
 		// 查询数据库
@@ -46,15 +45,10 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 		for i, video := range videoList {
 			videoIds[i] = video.Id
 		}
-		videoIds = append(videoIds, 0)
-		_, _ = l.svcCtx.Redis.Sadd(key, videoIds...)
+		_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
 		_ = l.svcCtx.Redis.Expire(key, 86400)
-		if len(videoList) == 0 {
-			return &publish.ListRes{}, nil
-		}
 	} else if len(result) == 1 { // 命中但为空
 		_ = l.svcCtx.Redis.Expire(key, 86400)
-		return &publish.ListRes{}, nil
 	} else { // 命中
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 		for i := len(result) - 1; i >= 0; i-- {
@@ -98,6 +92,10 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 		}
 	}
 
+	if len(videoList) == 0 {
+		return &publish.ListRes{}, nil
+	}
+
 	// 查询作者信息
 	if r, err := l.svcCtx.UserClient.GetUsers(context.Background(), &userclient.GetUsersReq{
 		ThisId:  in.ThisId,
@@ -113,7 +111,7 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 	}
 
 	// 查询点赞信息
-	if r, err := l.svcCtx.FavoriteClient.GetFavorites(context.Background(), &favoriteclient.GetFavoritesReq{
+	if r, err := l.svcCtx.FavoriteClient.GetVideoFavorite(context.Background(), &favoriteclient.GetVideoFavoriteReq{
 		UserId:   in.ThisId,
 		VideoIds: videoIds,
 	}); err == nil {

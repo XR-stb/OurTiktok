@@ -36,3 +36,13 @@ func (s *PublishServer) GetVideos(ctx context.Context, in *publish.GetVideosReq)
 	l := logic.NewGetVideosLogic(ctx, s.svcCtx)
 	return l.GetVideos(in)
 }
+
+func (s *PublishServer) GetVideoIds(ctx context.Context, in *publish.GetVideoIdsReq) (*publish.GetVideoIdsRes, error) {
+	l := logic.NewGetVideoIdsLogic(ctx, s.svcCtx)
+	return l.GetVideoIds(in)
+}
+
+func (s *PublishServer) GetWorkCount(ctx context.Context, in *publish.GetWorkCountReq) (*publish.GetWorkCountRes, error) {
+	l := logic.NewGetWorkCountLogic(ctx, s.svcCtx)
+	return l.GetWorkCount(in)
+}
