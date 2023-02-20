@@ -30,7 +30,7 @@ func (l *GetVideoFavoriteLogic) GetVideoFavorite(in *favorite.GetVideoFavoriteRe
 	key := fmt.Sprintf("fv_%d", in.UserId)
 	caching, _ := l.svcCtx.Redis.Sismember(key, 0)
 	if !caching {
-		var videoIds []int64
+		var videoIds []interface{}
 		l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ? AND status = ?", in.UserId, 1).Find(&videoIds)
 		_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
 	}

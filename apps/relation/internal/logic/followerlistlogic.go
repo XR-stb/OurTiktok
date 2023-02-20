@@ -37,7 +37,11 @@ func (l *FollowerListLogic) FollowerList(in *relation.FollowerListReq) (*relatio
 	if err != nil || len(result) == 0 {
 		// 查询数据库
 		l.svcCtx.DB.Table("relations").Select("follower_id").Where("followed_id = ? AND status = ?", userId, 1).Find(&followerIds)
-		_, _ = l.svcCtx.Redis.Sadd(key, append(followerIds, 0))
+		temp := make([]interface{}, len(followerIds), len(followerIds)+1)
+		for i, id := range followerIds {
+			temp[i] = id
+		}
+		_, _ = l.svcCtx.Redis.Sadd(key, append(temp, 0))
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 	} else {
 		followerIds = make([]int64, 0, len(result))

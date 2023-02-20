@@ -35,7 +35,7 @@ func (l *GetUserFavoriteLogic) GetUserFavorite(in *favorite.GetUserFavoriteReq) 
 		count, err := l.svcCtx.Redis.Scard(key)
 		if err != nil || count == 0 {
 			// 查询数据库
-			var videoIds []int64
+			var videoIds []interface{}
 			rows := l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ? AND status = ?", id, 1).Find(&videoIds).RowsAffected
 			_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
 			resList[i] = &favorite.UserFavorite{FavoriteCount: rows}

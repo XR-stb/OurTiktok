@@ -23,10 +23,11 @@ type ServiceContext struct {
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
-		Config:     c,
-		DB:         dao.NewGorm(c.MysqlDsn),
-		Redis:      redis.New(c.Redis.Host),
-		UserClient: userclient.NewUser(zrpc.MustNewClient(c.User, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
-		UserCache:  map[int64]*userclient.UserInfo{},
+		Config:       c,
+		DB:           dao.NewGorm(c.MysqlDsn),
+		Redis:        redis.New(c.Redis.Host),
+		UserClient:   userclient.NewUser(zrpc.MustNewClient(c.User, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
+		CommentCache: map[int64]*comment.CommentInfo{},
+		UserCache:    map[int64]*userclient.UserInfo{},
 	}
 }

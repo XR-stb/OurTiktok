@@ -55,6 +55,7 @@ message UserRes {
 message GetUsersReq {
   repeated int64 UserIds = 1;
   int64 ThisId = 2;
+  bool AllFollow = 3;
 }
 
 message GetUsersRes {

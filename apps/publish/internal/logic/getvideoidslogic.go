@@ -30,8 +30,12 @@ func (l *GetVideoIdsLogic) GetVideoIds(in *publish.GetVideoIdsReq) (*publish.Get
 	key := fmt.Sprintf("uv_%d", in.UserId)
 	members, err := l.svcCtx.Redis.Smembers(key)
 	if err != nil || len(members) == 0 {
-		l.svcCtx.DB.Table("videos").Select("video_id").Where("user_id = ?", in.UserId).Find(&videoIds)
-		_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
+		l.svcCtx.DB.Table("videos").Select("id").Where("author_id = ?", in.UserId).Find(&videoIds)
+		temp := make([]interface{}, len(videoIds), len(videoIds)+1)
+		for i, id := range videoIds {
+			temp[i] = id
+		}
+		_, _ = l.svcCtx.Redis.Sadd(key, append(temp, 0))
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 	} else if len(members) == 1 {
 		_ = l.svcCtx.Redis.Expire(key, 86400)

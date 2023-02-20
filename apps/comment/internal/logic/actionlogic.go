@@ -55,6 +55,7 @@ func (l *ActionLogic) Action(in *comment.ActionReq) (*comment.ActionRes, error) 
 			ThisId:  in.UserId,
 		})
 		if err == nil {
+			l.Info(r.Users)
 			_ = copier.Copy(userinfo, r.Users[0])
 		}
 
