@@ -55,7 +55,6 @@ func (l *ActionLogic) Action(in *comment.ActionReq) (*comment.ActionRes, error) 
 			ThisId:  in.UserId,
 		})
 		if err == nil {
-			l.Info(r.Users)
 			_ = copier.Copy(userinfo, r.Users[0])
 		}
 
@@ -75,7 +74,10 @@ func (l *ActionLogic) Action(in *comment.ActionReq) (*comment.ActionRes, error) 
 			},
 		}, nil
 	} else { // 删除评论
-		if err := l.svcCtx.DB.Delete(&dao.Comment{}).Where("id = ? AND user_id = ?", in.CommentId, in.UserId).Error; err != nil {
+		if err := l.svcCtx.DB.Delete(&dao.Comment{
+			Id:     in.CommentId,
+			UserId: in.UserId,
+		}).Error; err != nil {
 			return &comment.ActionRes{
 				Status: -1,
 			}, err
