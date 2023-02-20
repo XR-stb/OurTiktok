@@ -3,6 +3,7 @@ package logic
 import (
 	"OutTiktok/apps/favorite/favorite"
 	"OutTiktok/apps/publish/publish"
+	"OutTiktok/apps/relation/relation"
 	"context"
 	"fmt"
 
@@ -72,7 +73,18 @@ func (l *GetUsersLogic) GetUsers(in *user.GetUsersReq) (*user.GetUsersRes, error
 		}
 	}
 
-	//TODO: 获取关注信息
+	// 获取关注信息
+	if r, err := l.svcCtx.RelationClient.GetRelations(context.Background(), &relation.GetRelationsReq{
+		ThisId:    in.ThisId,
+		UserIds:   in.UserIds,
+		AllFollow: in.AllFollow,
+	}); err == nil {
+		for i, userRelation := range r.Relations {
+			users[i].FollowCount = userRelation.FollowCount
+			users[i].FollowerCount = userRelation.FollowerCount
+			users[i].IsFollow = userRelation.IsFollow
+		}
+	}
 
 	return &user.GetUsersRes{
 		Users: users,

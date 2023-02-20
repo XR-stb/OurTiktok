@@ -33,7 +33,7 @@ func (l *FriendListLogic) FriendList(in *relation.FriendListReq) (*relation.Frie
 
 	if ttl, _ := l.svcCtx.Redis.Ttl(key1); ttl < 0 {
 		// 查询数据库
-		var followIds []int64
+		var followIds []interface{}
 		l.svcCtx.DB.Table("relations").Select("followed_id").Where("follower_id = ? AND status = ?", in.UserId, 1).Find(&followIds)
 		_, _ = l.svcCtx.Redis.Sadd(key1, append(followIds, 0))
 	}
@@ -41,7 +41,7 @@ func (l *FriendListLogic) FriendList(in *relation.FriendListReq) (*relation.Frie
 
 	if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl < 0 {
 		// 查询数据库
-		var followerIds []int64
+		var followerIds []interface{}
 		l.svcCtx.DB.Table("relations").Select("follower_id").Where("followed_id = ? AND status = ?", in.UserId, 1).Find(&followerIds)
 		_, _ = l.svcCtx.Redis.Sadd(key2, append(followerIds, 0))
 	}
@@ -68,7 +68,7 @@ func (l *FriendListLogic) FriendList(in *relation.FriendListReq) (*relation.Frie
 	if r, err := l.svcCtx.UserClient.GetUsers(context.Background(), &user.GetUsersReq{
 		UserIds: friendIds,
 		ThisId:  in.ThisId,
-	}); err != nil {
+	}); err == nil {
 		for _, u := range r.Users {
 			l.svcCtx.UserCache[u.Id] = u
 		}

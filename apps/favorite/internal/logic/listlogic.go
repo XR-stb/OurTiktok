@@ -34,10 +34,12 @@ func (l *ListLogic) List(in *favorite.ListReq) (*favorite.ListRes, error) {
 	result, err := l.svcCtx.Redis.Smembers(key)
 	if err != nil || len(result) == 0 { // 未命中
 		// 查询数据库
-		if l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ?", in.UserId).Find(&videoIds).Error != nil {
-			return &favorite.ListRes{Status: -1}, nil
+		l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ?", in.UserId).Find(&videoIds)
+		temp := make([]interface{}, len(videoIds), len(videoIds)+1)
+		for i, id := range videoIds {
+			temp[i] = id
 		}
-		_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
+		_, _ = l.svcCtx.Redis.Sadd(key, append(temp, 0))
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 	} else if len(result) == 1 { // 命中为空
 		_ = l.svcCtx.Redis.Expire(key, 86400)

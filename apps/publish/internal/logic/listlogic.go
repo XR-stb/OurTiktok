@@ -41,11 +41,11 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 		// 查询数据库
 		l.svcCtx.DB.Where("author_id=?", authorId).Order("id desc").Find(&videoList)
 		// 写回缓存
-		videoIds := make([]interface{}, len(videoList)+1)
-		for i, video := range videoList {
-			videoIds[i] = video.Id
+		temp := make([]interface{}, len(videoIds), len(videoIds)+1)
+		for i, id := range videoIds {
+			temp[i] = id
 		}
-		_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
+		_, _ = l.svcCtx.Redis.Sadd(key, append(temp, 0))
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 	} else if len(result) == 1 { // 命中但为空
 		_ = l.svcCtx.Redis.Expire(key, 86400)
