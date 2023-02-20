@@ -57,7 +57,6 @@ func (l *UserLogic) User(req *types.UserReq) (resp *types.UserRes, err error) {
 		resp.StatusMsg = "用户不存在"
 		return
 	}
-	l.Info(r.User)
 
 	_ = copier.Copy(&resp.User, r.User)
 	return

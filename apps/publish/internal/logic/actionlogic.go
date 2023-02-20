@@ -52,8 +52,8 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 		AuthorId:   in.UserId,
 		UploadTime: time.Now().UnixMilli(),
 		PlayUrl:    "http://" + l.svcCtx.Config.Minio.Host + "/videos/" + filename + ".mp4",
-		CoverUrl:   "http://" + l.svcCtx.Config.Minio.Host + "/covers/" + filename + ".jpg",
-		Title:      in.Title,
+		//CoverUrl:   "http://" + l.svcCtx.Config.Minio.Host + "/covers/" + filename + ".jpg",
+		Title: in.Title,
 	}
 	if l.svcCtx.DB.Create(&video).Error != nil {
 		return &publish.ActionRes{Status: -1}, nil

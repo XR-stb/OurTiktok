@@ -39,11 +39,11 @@ func (l *CommentActionLogic) CommentAction(req *types.CommentActionReq) (resp *t
 	}
 	UserId = claims.UserId
 
-	//// 检查参数
+	// 检查参数
 	if req.ActionType != 1 && req.ActionType != 2 {
 		resp.StatusCode = -1
-		resp.StatusMsg = "操作类型数不对， 非删除（2）和增加（1）操作"
-		return resp, nil
+		resp.StatusMsg = "Wrong action_type"
+		return
 	}
 
 	r, err := l.svcCtx.CommentClient.Action(context.Background(), &comment.ActionReq{

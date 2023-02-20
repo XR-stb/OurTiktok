@@ -58,7 +58,6 @@ func (l *CommentListLogic) CommentList(req *types.CommentListReq) (resp *types.C
 
 	resp.CommentList = make([]types.Comment, len(r.CommentList))
 	for i, info := range r.CommentList {
-		l.Info(info)
 		_ = copier.Copy(&resp.CommentList[i], &info)
 		resp.CommentList[i].CreateDate = time.Unix(info.CreateTime, 0).Format("01-02")
 	}

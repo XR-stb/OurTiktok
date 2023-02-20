@@ -2,6 +2,7 @@ package comment
 
 import (
 	"net/http"
+	"strconv"
 
 	"OutTiktok/apps/gateway/internal/logic/comment"
 	"OutTiktok/apps/gateway/internal/svc"
@@ -17,6 +18,7 @@ func CommentActionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		//	return
 		//}
 		_ = httpx.Parse(r, &req)
+		req.CommentId, _ = strconv.ParseInt(r.FormValue("comment_id"), 10, 64)
 
 		l := comment.NewCommentActionLogic(r.Context(), svcCtx)
 		resp, err := l.CommentAction(&req)
