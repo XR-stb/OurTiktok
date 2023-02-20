@@ -37,7 +37,7 @@ func (l *ActionLogic) Action(in *relation.ActionReq) (*relation.ActionRes, error
 
 	var err error
 	if actionType == 1 {
-		if err := l.svcCtx.DB.Create(&relationModel).Error; err != nil {
+		if err = l.svcCtx.DB.Create(&relationModel).Error; err != nil {
 			err = l.svcCtx.DB.Model(&relationModel).Where("followed_id=? AND follower_id=?", userId, thisId).Update("status", actionType).Error
 		}
 	} else {
@@ -51,34 +51,22 @@ func (l *ActionLogic) Action(in *relation.ActionReq) (*relation.ActionRes, error
 	}
 
 	// 更新缓存
-	fanskey := fmt.Sprintf("rfansc_%d", userId)
-	followkey := fmt.Sprintf("rfollowc_%d", thisId)
-	fansCount, _ := l.svcCtx.Redis.Get(fanskey)
-	followCount, _ := l.svcCtx.Redis.Get(followkey)
-	if fansCount == "" {
-		var count int64
-		l.svcCtx.DB.Table("relations").Where("followed_id = ?", userId).Count(&count)
-		_ = l.svcCtx.Redis.Setex(fanskey, fmt.Sprintf("%d", count), 86400)
-	} else {
-		if actionType == 1 {
-			_, _ = l.svcCtx.Redis.Incr(fanskey)
-		} else {
-			_, _ = l.svcCtx.Redis.Decr(fanskey)
+	key := fmt.Sprintf("follow_%d", in.ThisId)
+	key2 := fmt.Sprintf("fans_%d", in.UserId)
+	if actionType == 1 {
+		if ttl, _ := l.svcCtx.Redis.Ttl(key); ttl > 0 { // 缓存存在->添加
+			_, _ = l.svcCtx.Redis.Sadd(key, in.UserId)
 		}
-		_ = l.svcCtx.Redis.Expire(fanskey, 86400)
-	}
-
-	if followCount == "" {
-		var count int64
-		l.svcCtx.DB.Table("relations").Where("follower_id = ?", thisId).Count(&count)
-		_ = l.svcCtx.Redis.Setex(followkey, fmt.Sprintf("%d", count), 86400)
-	} else {
-		if actionType == 1 {
-			_, _ = l.svcCtx.Redis.Incr(followkey)
-		} else {
-			_, _ = l.svcCtx.Redis.Incr(followkey)
+		if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
+			_, _ = l.svcCtx.Redis.Sadd(key2, in.ThisId)
 		}
-		_ = l.svcCtx.Redis.Expire(followkey, 86400)
+	} else {
+		if ttl, _ := l.svcCtx.Redis.Ttl(key); ttl > 0 {
+			_, _ = l.svcCtx.Redis.Srem(key, in.UserId)
+		}
+		if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
+			_, _ = l.svcCtx.Redis.Srem(key2, in.ThisId)
+		}
 	}
 
 	return &relation.ActionRes{}, nil

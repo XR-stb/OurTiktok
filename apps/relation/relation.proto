@@ -28,8 +28,20 @@ message FriendUser {
   int64 FollowCount = 3;
   int64 FollowerCount = 4;
   bool IsFollow = 5;
-  string Message = 6;
-  int32 MsgType = 7;
+  string Avatar = 6;
+  string BackgroundImage = 7;
+  string Signature = 8;
+  int64 TotalFavorited = 9;
+  int64 WorkCount = 10;
+  int64 FavoriteCount = 11;
+  string Message = 12;
+  int32 MsgType = 13;
+}
+
+message UserRelation {
+  int64 FollowCount = 1;
+  int64 FollowerCount = 2;
+  bool IsFollow = 3;
 }
 
 message ActionReq {
@@ -75,10 +87,11 @@ message FriendListRes {
 message GetRelationsReq {
   int64 ThisId = 1;
   repeated int64 UserIds = 2;
+  bool AllFollow = 3;
 }
 
 message GetRelationsRes {
-  repeated UserInfo Users = 1;
+  repeated UserRelation Relations = 1;
 }
 
 service Relation {

@@ -32,13 +32,13 @@ func (l *GetWorkCountLogic) GetWorkCount(in *publish.GetWorkCountReq) (*publish.
 		if err != nil || count == 0 {
 			var videoIds []int64
 			rows := l.svcCtx.DB.Table("videos").Select("id").Where("user_id = ?", id).Find(&videoIds).RowsAffected
-			videoIds = append(videoIds, 0)
-			_, _ = l.svcCtx.Redis.Sadd(key, videoIds)
+			_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
+			_ = l.svcCtx.Redis.Expire(key, 86400)
 			counts[i] = rows
 		} else {
+			_ = l.svcCtx.Redis.Expire(key, 86400)
 			counts[i] = count - 1
 		}
-		_ = l.svcCtx.Redis.Expire(key, 86400)
 	}
 
 	return &publish.GetWorkCountRes{

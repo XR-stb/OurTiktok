@@ -5,8 +5,10 @@ import (
 	"OutTiktok/apps/relation/relation"
 	"OutTiktok/apps/user/userclient"
 	"context"
+	"fmt"
 	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
+	"strconv"
 )
 
 type FollowListLogic struct {
@@ -27,15 +29,35 @@ func NewFollowListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Follow
 func (l *FollowListLogic) FollowList(in *relation.FollowListReq) (*relation.FollowListRes, error) {
 	userId := in.UserId
 	thisId := in.ThisId
+	var followIds []int64
 
-	// 查询数据库
-	var followedIds []int64
-	l.svcCtx.DB.Table("relations").Select("followed_id").Where("follower_id = ? AND status = ?", userId, 1).Find(&followedIds)
+	// 查询缓存
+	key := fmt.Sprintf("follow_%d", userId)
+	result, err := l.svcCtx.Redis.Smembers(key)
+	if err != nil || len(result) == 0 {
+		// 查询数据库
+		l.svcCtx.DB.Table("relations").Select("followed_id").Where("follower_id = ? AND status = ?", userId, 1).Find(&followIds)
+		_, _ = l.svcCtx.Redis.Sadd(key, append(followIds, 0))
+		_ = l.svcCtx.Redis.Expire(key, 86400)
+	} else {
+		_ = l.svcCtx.Redis.Expire(key, 86400)
+		followIds = make([]int64, 0, len(result))
+		for _, id := range result {
+			if id == "0" {
+				continue
+			}
+			id, _ := strconv.ParseInt(id, 10, 64)
+			followIds = append(followIds, id)
+		}
+	}
+	if len(followIds) < 1 {
+		return &relation.FollowListRes{}, nil
+	}
 
 	// 获取用户信息
-	users := make([]*relation.UserInfo, len(followedIds))
+	users := make([]*relation.UserInfo, len(followIds))
 	if r, err := l.svcCtx.UserClient.GetUsers(context.Background(), &userclient.GetUsersReq{
-		UserIds: followedIds,
+		UserIds: followIds,
 		ThisId:  thisId,
 	}); err == nil {
 		for i, user := range r.Users {

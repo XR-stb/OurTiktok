@@ -37,12 +37,13 @@ func (l *ListLogic) List(in *favorite.ListReq) (*favorite.ListRes, error) {
 		if l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ?", in.UserId).Find(&videoIds).Error != nil {
 			return &favorite.ListRes{Status: -1}, nil
 		}
-		if len(videoIds) == 0 {
-			return &favorite.ListRes{}, nil
-		}
+		_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
+		_ = l.svcCtx.Redis.Expire(key, 86400)
 	} else if len(result) == 1 { // 命中为空
+		_ = l.svcCtx.Redis.Expire(key, 86400)
 		return &favorite.ListRes{}, nil
 	} else { // 命中
+		_ = l.svcCtx.Redis.Expire(key, 86400)
 		videoIds = make([]int64, 0, len(result)-1)
 		for _, id := range result {
 			if id == "0" {
@@ -51,6 +52,10 @@ func (l *ListLogic) List(in *favorite.ListReq) (*favorite.ListRes, error) {
 			id, _ := strconv.ParseInt(id, 10, 64)
 			videoIds = append(videoIds, id)
 		}
+	}
+
+	if len(videoIds) == 0 {
+		return &favorite.ListRes{}, nil
 	}
 
 	// 查询视频信息

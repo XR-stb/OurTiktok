@@ -37,12 +37,12 @@ func (l *GetUserFavoriteLogic) GetUserFavorite(in *favorite.GetUserFavoriteReq) 
 			// 查询数据库
 			var videoIds []int64
 			rows := l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ? AND status = ?", id, 1).Find(&videoIds).RowsAffected
-			videoIds = append(videoIds, 0)
-			_, _ = l.svcCtx.Redis.Sadd(key, videoIds)
+			_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
 			resList[i] = &favorite.UserFavorite{FavoriteCount: rows}
 		} else {
 			resList[i] = &favorite.UserFavorite{FavoriteCount: count - 1}
 		}
+		_ = l.svcCtx.Redis.Expire(key, 86400)
 
 		// 获取用户发布的视频ID
 		r, err := l.svcCtx.PublishClient.GetVideoIds(context.Background(), &publish.GetVideoIdsReq{UserId: id})
@@ -50,23 +50,24 @@ func (l *GetUserFavoriteLogic) GetUserFavorite(in *favorite.GetUserFavoriteReq) 
 			continue
 		}
 		// 查询视频获赞
-		var totalfavorited int64
+		var totalFavorited int64
 		for _, vid := range r.VideoIds {
 			// 查询缓存
 			key := fmt.Sprintf("fc_%d", vid)
 			count, _ := l.svcCtx.Redis.Get(key)
 			if count == "" {
 				// 查询数据库
-				var fcount int64
-				l.svcCtx.DB.Table("favorites").Where("video_id = ? AND status = ?", vid, 1).Count(&fcount)
-				_ = l.svcCtx.Redis.Setex(key, strconv.FormatInt(fcount, 10), 86400)
-				totalfavorited += fcount
+				var sqlCount int64
+				l.svcCtx.DB.Table("favorites").Where("video_id = ? AND status = ?", vid, 1).Count(&sqlCount)
+				_ = l.svcCtx.Redis.Setex(key, strconv.FormatInt(sqlCount, 10), 86400)
+				totalFavorited += sqlCount
 			} else {
 				count, _ := strconv.ParseInt(count, 10, 64)
-				totalfavorited += count
+				totalFavorited += count
 			}
+			_ = l.svcCtx.Redis.Expire(key, 86400)
 		}
-		resList[i].TotalFavorited = totalfavorited
+		resList[i].TotalFavorited = totalFavorited
 	}
 
 	return &favorite.GetUserFavoriteRes{

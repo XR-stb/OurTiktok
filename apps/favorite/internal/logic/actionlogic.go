@@ -68,9 +68,13 @@ func (l *ActionLogic) Action(in *favorite.ActionReq) (*favorite.ActionRes, error
 	}
 
 	if in.ActionType == 1 {
-		_, _ = l.svcCtx.Redis.Sadd(key2, 0, in.VideoId) // 0占位
+		if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
+			_, _ = l.svcCtx.Redis.Sadd(key2, in.VideoId)
+		}
 	} else {
-		_, _ = l.svcCtx.Redis.Srem(key2, in.VideoId)
+		if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
+			_, _ = l.svcCtx.Redis.Srem(key2, in.VideoId)
+		}
 	}
 	_ = l.svcCtx.Redis.Expire(key2, 86400)
 

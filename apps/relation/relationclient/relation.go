@@ -25,6 +25,7 @@ type (
 	GetRelationsReq = relation.GetRelationsReq
 	GetRelationsRes = relation.GetRelationsRes
 	UserInfo        = relation.UserInfo
+	UserRelation    = relation.UserRelation
 
 	Relation interface {
 		Action(ctx context.Context, in *ActionReq, opts ...grpc.CallOption) (*ActionRes, error)

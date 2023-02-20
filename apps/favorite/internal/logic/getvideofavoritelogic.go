@@ -32,9 +32,10 @@ func (l *GetVideoFavoriteLogic) GetVideoFavorite(in *favorite.GetVideoFavoriteRe
 	if !caching {
 		var videoIds []int64
 		l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ? AND status = ?", in.UserId, 1).Find(&videoIds)
-		videoIds = append(videoIds, 0)
-		_, _ = l.svcCtx.Redis.Sadd(key, videoIds)
+		_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
 	}
+	_ = l.svcCtx.Redis.Expire(key, 86400)
+
 	nonCacheList := make([]int64, 0, len(in.VideoIds))
 	for i, id := range in.VideoIds {
 		key2 := fmt.Sprintf("fc_%d", id)
@@ -56,7 +57,6 @@ func (l *GetVideoFavoriteLogic) GetVideoFavorite(in *favorite.GetVideoFavoriteRe
 			resList[i].IsFavorite = is
 		}
 	}
-	_ = l.svcCtx.Redis.Expire(key, 86400)
 
 	return &favorite.GetVideoFavoriteRes{
 		Favorites: resList,
