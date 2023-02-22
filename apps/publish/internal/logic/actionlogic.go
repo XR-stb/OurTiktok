@@ -7,7 +7,8 @@ import (
 	"fmt"
 	"github.com/minio/minio-go/v6"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
-	"io"
+	"image"
+	"image/jpeg"
 	"os"
 	"strconv"
 	"time"
@@ -41,19 +42,28 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 		return &publish.ActionRes{Status: -1}, nil
 	}
 
-	// 上传缩略图
-	//reader2 := readFrameAsJpeg(l.svcCtx.Config.Minio.Host+"/videos/"+filename, 1)
-	//if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.CoverBucket, filename+".jpg", reader2, reader.Size(), minio.PutObjectOptions{ContentType: "image/jpeg"}); err != nil {
-	//	return &publish.ActionRes{Status: -1}, nil
-	//}
+	// 视频链接
+	playUrl := "http://116.62.164.8:9000/videos/" + filename + ".mp4"
+
+	// 获取封面
+	coverData, err := readFrameAsJpeg(playUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	//上传封面
+	coverReader := bytes.NewReader(coverData)
+	if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.CoverBucket, filename+".jpg", coverReader, coverReader.Size(), minio.PutObjectOptions{ContentType: "image/jpeg"}); err != nil {
+		return &publish.ActionRes{Status: -1}, nil
+	}
 
 	// 写入数据库
 	video := dao.Video{
 		AuthorId:   in.UserId,
 		UploadTime: time.Now().UnixMilli(),
 		PlayUrl:    "http://" + l.svcCtx.Config.Minio.Host + "/videos/" + filename + ".mp4",
-		//CoverUrl:   "http://" + l.svcCtx.Config.Minio.Host + "/covers/" + filename + ".jpg",
-		Title: in.Title,
+		CoverUrl:   "http://" + l.svcCtx.Config.Minio.Host + "/covers/" + filename + ".jpg",
+		Title:      in.Title,
 	}
 	if l.svcCtx.DB.Create(&video).Error != nil {
 		return &publish.ActionRes{Status: -1}, nil
@@ -75,15 +85,25 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 	return &publish.ActionRes{}, nil
 }
 
-func readFrameAsJpeg(inFileName string, frameNum int) io.Reader {
-	buf := bytes.NewBuffer(nil)
-	err := ffmpeg.Input(inFileName).
-		Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", frameNum)}).
+// ReadFrameAsJpeg
+// 从视频流中截取一帧并返回 需要在本地环境中安装ffmpeg并将bin添加到环境变量
+func readFrameAsJpeg(filePath string) ([]byte, error) {
+	reader := bytes.NewBuffer(nil)
+	err := ffmpeg.Input(filePath).
+		Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", 1)}).
 		Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
-		WithOutput(buf, os.Stdout).
+		WithOutput(reader, os.Stdout).
 		Run()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return buf
+	img, _, err := image.Decode(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	buf := new(bytes.Buffer)
+	jpeg.Encode(buf, img, nil)
+
+	return buf.Bytes(), err
 }
