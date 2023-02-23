@@ -10,7 +10,7 @@ MysqlDsn: root:baytan123@tcp(127.0.0.1:3306)/fakedouyin?charset=utf8&parseTime=T
 Redis:
   Host: 127.0.0.1:6379
 Minio:
-  Host: 116.62.164.8:9090
+  Host: 116.62.164.8:9000
 Publish:
   Target: consul://127.0.0.1:8500/publish.rpc?wait=14s
   NonBlock: true

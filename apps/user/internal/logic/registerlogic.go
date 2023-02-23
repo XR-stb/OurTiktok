@@ -39,8 +39,8 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error
 	u := dao.User{
 		Username:        username,
 		Password:        fmt.Sprintf("%x", md5.Sum([]byte(password))), // md5加密
-		Avatar:          fmt.Sprintf("http://%s/avatar/%d.png", l.svcCtx.Config.Minio.Host, rand.Intn(avatarNum)),
-		BackgroundImage: fmt.Sprintf("http://%s/backgroundimage/%d.jpeg", l.svcCtx.Config.Minio.Host, rand.Intn(backgroundImageNum)),
+		Avatar:          fmt.Sprintf("http://%s/avatars/%d.png", l.svcCtx.Config.Minio.Host, rand.Intn(avatarNum)),
+		BackgroundImage: fmt.Sprintf("http://%s/backgroundimages/%d.jpeg", l.svcCtx.Config.Minio.Host, rand.Intn(backgroundImageNum)),
 		Signature:       signatures[rand.Intn(signatureNum)],
 	}
 	if err := l.svcCtx.DB.Create(&u).Error; err != nil {
