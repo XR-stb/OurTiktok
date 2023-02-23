@@ -33,7 +33,7 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginRes, error) {
 	// 查询账号并验证密码
 	u := dao.User{}
 	password = fmt.Sprintf("%x", md5.Sum([]byte(password)))
-	if err := l.svcCtx.DB.Where("username=? AND password=?", username, password).Find(&u).Error; err != nil {
+	if err := l.svcCtx.DB.Where("username=? AND password=?", username, password).First(&u).Error; err != nil {
 		return &user.LoginRes{
 			Status: -1,
 		}, nil
