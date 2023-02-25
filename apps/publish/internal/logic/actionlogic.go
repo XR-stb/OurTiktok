@@ -42,20 +42,18 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 		return &publish.ActionRes{Status: -1}, nil
 	}
 
-	// 视频链接
-	playUrl := "http://116.62.164.8:9000/videos/" + filename + ".mp4"
+	// 异步生成封面
+	go func() {
+		// 视频链接
+		playUrl := "http://" + l.svcCtx.Config.Minio.Host + "/videos/" + filename + ".mp4"
 
-	// 获取封面
-	coverData, err := readFrameAsJpeg(playUrl)
-	if err != nil {
-		return nil, err
-	}
+		// 获取封面
+		coverData, _ := readFrameAsJpeg(playUrl)
 
-	//上传封面
-	coverReader := bytes.NewReader(coverData)
-	if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.CoverBucket, filename+".jpg", coverReader, coverReader.Size(), minio.PutObjectOptions{ContentType: "image/jpeg"}); err != nil {
-		return &publish.ActionRes{Status: -1}, nil
-	}
+		//上传封面
+		coverReader := bytes.NewReader(coverData)
+		_, _ = l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.CoverBucket, filename+".jpg", coverReader, coverReader.Size(), minio.PutObjectOptions{ContentType: "image/jpeg"})
+	}()
 
 	// 写入数据库
 	video := dao.Video{
@@ -69,17 +67,19 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 		return &publish.ActionRes{Status: -1}, nil
 	}
 
-	// 写入缓存
+	// 写入视频信息缓存
 	key := fmt.Sprintf("vinfo_%d", video.Id)
-	key2 := fmt.Sprintf("uv_%d", in.UserId)
 	val := fmt.Sprintf("%d_%s_%s_%s", in.UserId, video.PlayUrl, video.CoverUrl, in.Title)
-
 	_ = l.svcCtx.Redis.Setex(key, val, 86400)
 
+	// 写入用户发布列表缓存
+	key2 := fmt.Sprintf("uv_%d", in.UserId)
 	if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
-		_, _ = l.svcCtx.Redis.Sadd(key2, video.Id) // 0占位
+		_, _ = l.svcCtx.Redis.Sadd(key2, 0, video.Id)
+		_ = l.svcCtx.Redis.Expire(key2, 86400)
 	}
 
+	// 更新到feed
 	_, _ = l.svcCtx.Redis.Zadd("feed", video.UploadTime, strconv.FormatInt(video.Id, 10))
 
 	return &publish.ActionRes{}, nil
@@ -103,7 +103,7 @@ func readFrameAsJpeg(filePath string) ([]byte, error) {
 	}
 
 	buf := new(bytes.Buffer)
-	jpeg.Encode(buf, img, nil)
+	_ = jpeg.Encode(buf, img, nil)
 
 	return buf.Bytes(), err
 }

@@ -27,17 +27,22 @@ func NewGetVideoIdsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetVi
 
 func (l *GetVideoIdsLogic) GetVideoIds(in *publish.GetVideoIdsReq) (*publish.GetVideoIdsRes, error) {
 	var videoIds []int64
+
+	// 从缓存获取
 	key := fmt.Sprintf("uv_%d", in.UserId)
 	members, err := l.svcCtx.Redis.Smembers(key)
-	if err != nil || len(members) == 0 {
+	if err != nil || len(members) == 0 { // 缓存未命中
+		// 从数据库中查询
 		l.svcCtx.DB.Table("videos").Select("id").Where("author_id = ?", in.UserId).Find(&videoIds)
+
+		// 写回缓存
 		temp := make([]interface{}, len(videoIds), len(videoIds)+1)
 		for i, id := range videoIds {
 			temp[i] = id
 		}
 		_, _ = l.svcCtx.Redis.Sadd(key, append(temp, 0))
 		_ = l.svcCtx.Redis.Expire(key, 86400)
-	} else if len(members) == 1 {
+	} else if len(members) == 1 { // 缓存命中但为空
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 	} else {
 		_ = l.svcCtx.Redis.Expire(key, 86400)
