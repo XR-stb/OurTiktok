@@ -1,9 +1,13 @@
 package main
 
 import (
+	"OutTiktok/dao"
 	"flag"
 	"fmt"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/zero-contrib/zrpc/registry/consul"
+	"gorm.io/gorm"
+	"strconv"
 	"time"
 
 	"OutTiktok/apps/publish/internal/config"
@@ -26,6 +30,7 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
+	initFeed(ctx.Redis, ctx.DB)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		publish.RegisterPublishServer(grpcServer, server.NewPublishServer(ctx))
@@ -43,4 +48,16 @@ func main() {
 
 	fmt.Printf("[%s] Starting rpc server at %s...\n", time.Now().Format("2006-01-02 15:04:05"), c.ListenOn)
 	s.Start()
+}
+
+// 将视频流缓存至Redis
+func initFeed(redis *redis.Redis, DB *gorm.DB) {
+	var videos []*dao.Video
+	DB.Find(&videos)
+	for _, v := range videos {
+		_, err := redis.Zadd("feed", v.UploadTime, strconv.FormatInt(v.Id, 10))
+		if err != nil {
+			panic("Make sure Redis alive")
+		}
+	}
 }
