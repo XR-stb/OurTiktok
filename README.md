@@ -73,10 +73,10 @@ cd apps/favorite && go run favorite.go
 cd apps/comment && go run comment.go
 ```
 
-启动Follow服务
+启动Relation服务
 
 ```shell
-cd apps/follow && go run follow.go
+cd apps/relation && go run relation.go
 ```
 
 启动Message服务
