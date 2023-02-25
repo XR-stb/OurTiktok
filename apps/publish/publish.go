@@ -51,13 +51,20 @@ func main() {
 }
 
 // 将视频流缓存至Redis
-func initFeed(redis *redis.Redis, DB *gorm.DB) {
+func initFeed(Redis *redis.Redis, DB *gorm.DB) {
+	// 查询数据库
 	var videos []*dao.Video
 	DB.Find(&videos)
-	for _, v := range videos {
-		_, err := redis.Zadd("feed", v.UploadTime, strconv.FormatInt(v.Id, 10))
-		if err != nil {
-			panic("Make sure Redis alive")
-		}
+
+	// 写入缓存
+	pairs := make([]redis.Pair, len(videos))
+	for i, v := range videos {
+		pairs[i].Key = strconv.FormatInt(v.Id, 10)
+		pairs[i].Score = v.UploadTime
+	}
+
+	_, err := Redis.Zadds("feed", pairs...)
+	if err != nil {
+		panic("Make sure Redis alive")
 	}
 }
