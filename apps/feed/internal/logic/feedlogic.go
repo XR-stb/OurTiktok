@@ -32,7 +32,7 @@ func (l *FeedLogic) Feed(in *feed.FeedReq) (*feed.FeedRes, error) {
 		stop = math.MaxInt64
 	}
 
-	// 查询zset
+	// 查询缓存
 	pairs, err := l.svcCtx.Redis.ZrevrangebyscoreWithScoresAndLimit("feed", 0, stop, 0, 30)
 	if err != nil {
 		return &feed.FeedRes{Status: -1}, nil

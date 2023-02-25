@@ -36,9 +36,11 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 	// 查询缓存
 	nonCacheList := make([]int64, 0, len(videoIds)) // 未命中列表
 	for _, id := range in.VideoIds {
+		// 从缓存中查询
 		key := fmt.Sprintf("vinfo_%d", id)
 		result, err := l.svcCtx.Redis.Get(key)
 		if err != nil || result == "" {
+			// 加入未命中列表
 			nonCacheList = append(nonCacheList, id)
 			continue
 		}
@@ -61,14 +63,16 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 		}
 	}
 
-	// 写入结果
+	// 写入结果,并获取作者ID
 	videoList := make([]*publish.Video, len(videoIds))
+	AuthorIds := make([]int64, 0, len(videoIds))
 	for i, id := range videoIds {
-		videoList[i] = l.svcCtx.VideoCache[id]
+		v := l.svcCtx.VideoCache[id]
+		videoList[i] = v
+		AuthorIds = append(AuthorIds, v.AuthorId)
 	}
 
 	// 查询作者信息
-	AuthorIds := make([]int64, 0, len(videoList))
 	for _, video := range videoList {
 		AuthorIds = append(AuthorIds, video.AuthorId)
 	}
@@ -110,6 +114,7 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 	}, nil
 }
 
+// 解析成结构体
 func parseToVideo(id int64, str string) *publish.Video {
 	splits := strings.Split(str, "_")
 	authorId, _ := strconv.ParseInt(splits[0], 10, 64)

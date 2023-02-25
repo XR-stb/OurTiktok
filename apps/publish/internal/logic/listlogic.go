@@ -59,8 +59,10 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 			videoIds = append(videoIds, id)
 		}
 
-		nonCacheList := make([]int64, 0, len(result)) // 未命中列表
 		// 查询视频信息
+		nonCacheList := make([]int64, 0, len(result)) // 未命中列表
+
+		// 从缓存中查询
 		for _, id := range videoIds {
 			key := fmt.Sprintf("vinfo_%d", id)
 			str, err := l.svcCtx.Redis.Get(key)
@@ -86,6 +88,7 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 			}
 		}
 
+		// 写入结果
 		videoList = make([]*publish.Video, len(videoIds))
 		for i, id := range videoIds {
 			videoList[i] = l.svcCtx.VideoCache[id]
