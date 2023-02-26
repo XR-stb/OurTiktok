@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package message;
+option go_package="./message";
+
+enum Status {
+  OK = 0;
+  notOK = 1;
+}
+
+message MessageInfo {
+  int64 Id = 1;
+  int64 ToUserId = 2;
+  int64 FromUserId = 3;
+  string Content = 4;
+  int64 CreateTime = 5;
+}
+
+message MessageActionReq {
+   int64 FromUserID = 1;
+   int64 ToUserId = 2;
+   int32 ActionType = 3;
+   string Content = 4;
+}
+
+message MessageActionRes {
+   Status Status = 1;
+}
+
+message MessageChatReq {
+  int64 FromUserID = 1;
+  int64 ToUserId = 2;
+  int64 PreMsgTime = 3;
+}
+
+message MessageChatRes {
+  Status Status = 1;
+  repeated MessageInfo MessageList = 2;
+}
+
+service Message {
+  rpc Action(MessageActionReq) returns(MessageActionRes);
+  rpc Chat(MessageChatReq) returns(MessageChatRes);
+}
