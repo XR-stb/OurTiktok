@@ -9,8 +9,11 @@
 1. 服务注册与发现：Consul
 2. 服务网关：Go-zero生成
 3. 服务调用：gRPC
-4. 服务监控：Prometheus
-5. 数据库交互：Gorm
+4. 数据库交互：Gorm
+5. 服务监控：Prometheus
+6. 链路追踪：Jaeger
+7. 配置中心：Nacos
+8. 对象存储：Minio
 
 ## 项目功能
 
@@ -37,7 +40,7 @@
 
 ## 启动项目
 
-启动Consul、Mysql、Redis并配置
+启动Consul、Mysql、Redis、Minio并进行配置
 
 ```shell
 consul agent -dev
@@ -52,7 +55,7 @@ cd apps/feed && go run feed.go
 启动Publish服务
 
 ```shell
-cd apps/feed && go run feed.go
+cd apps/feed && go run publish.go
 ```
 
 启动User服务
@@ -91,3 +94,9 @@ cd apps/message && go run message.go
 cd apps/gateway && go run gateway.go
 ```
 
+## TODO
+1. 使用Nacos作为配置中心，简化配置步骤
+2. 使用Prometheus作为服务监控
+3. 使用Jaeger作为链路追踪
+4. 开发后台管理系统（待定）
+5. Docker部署（待定）
