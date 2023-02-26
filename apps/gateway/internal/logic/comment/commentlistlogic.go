@@ -32,12 +32,9 @@ func (l *CommentListLogic) CommentList(req *types.CommentListReq) (resp *types.C
 	// 验证Token
 	var UserId int64
 	claims, err := jwt.VerifyToken(req.Token)
-	if err != nil {
-		resp.StatusCode = -1
-		resp.StatusMsg = err.Error()
-		return
+	if err == nil {
+		UserId = claims.UserId
 	}
-	UserId = claims.UserId
 
 	r, err := l.svcCtx.CommentClient.List(context.Background(), &comment.ListReq{
 		UserId:  UserId,

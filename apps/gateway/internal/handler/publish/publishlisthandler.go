@@ -2,6 +2,7 @@ package publish
 
 import (
 	"net/http"
+	"strconv"
 
 	"OutTiktok/apps/gateway/internal/logic/publish"
 	"OutTiktok/apps/gateway/internal/svc"
@@ -12,10 +13,8 @@ import (
 func PublishListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.PublishListReq
-		if err := httpx.Parse(r, &req); err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-			return
-		}
+		req.Token = r.FormValue("token")
+		req.UserId, _ = strconv.ParseInt(r.FormValue("user_id"), 10, 64)
 
 		l := publish.NewPublishListLogic(r.Context(), svcCtx)
 		resp, err := l.PublishList(&req)

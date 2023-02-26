@@ -38,11 +38,6 @@ func (l *RelationFriendListLogic) RelationFriendList(req *types.RelationFriendLi
 		return
 	}
 	ThisId = claims.UserId
-	if ThisId != req.UserId {
-		resp.StatusCode = -1
-		resp.StatusMsg = "没有权限"
-		return
-	}
 
 	r, err := l.svcCtx.RelationClient.FriendList(context.Background(), &relation.FriendListReq{
 		ThisId: ThisId,
