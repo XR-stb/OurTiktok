@@ -26,34 +26,39 @@ func NewGetVideoFavoriteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 
 func (l *GetVideoFavoriteLogic) GetVideoFavorite(in *favorite.GetVideoFavoriteReq) (*favorite.GetVideoFavoriteRes, error) {
 	resList := make([]*favorite.VideoFavorite, len(in.VideoIds))
-	// 查询缓存
+
+	// 检查用户点赞列表是否缓存
 	key := fmt.Sprintf("fv_%d", in.UserId)
-	caching, _ := l.svcCtx.Redis.Sismember(key, 0)
-	if !caching {
+	if caching, _ := l.svcCtx.Redis.Sismember(key, 0); !caching {
 		var videoIds []interface{}
 		l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ? AND status = ?", in.UserId, 1).Find(&videoIds)
 		_, _ = l.svcCtx.Redis.Sadd(key, append(videoIds, 0))
 	}
 	_ = l.svcCtx.Redis.Expire(key, 86400)
 
-	nonCacheList := make([]int64, 0, len(in.VideoIds))
-	for i, id := range in.VideoIds {
-		key2 := fmt.Sprintf("fc_%d", id)
-		val, err := l.svcCtx.Redis.Get(key2)
-		if err != nil {
-			nonCacheList = append(nonCacheList, id)
-			continue
+	// 查询缓存
+	for i, vid := range in.VideoIds {
+		// 查询视频点赞数量
+		var count int64
+		key2 := fmt.Sprintf("fc_%d", vid)
+		val, _ := l.svcCtx.Redis.Get(key2)
+		if val == "" { // 未命中
+			// 查询数据库
+			l.svcCtx.DB.Table("favorites").Where("video_id = ? AND status = ?", vid, 1).Count(&count)
+			// 写回缓存
+			_ = l.svcCtx.Redis.Setex(key2, strconv.FormatInt(count, 10), 86400)
 		}
 		// 刷新过期时间
 		_ = l.svcCtx.Redis.Expire(key2, 86400)
 
-		count, _ := strconv.ParseInt(val, 10, 64)
+		count, _ = strconv.ParseInt(val, 10, 64)
 		resList[i] = &favorite.VideoFavorite{FavoriteCount: count}
 
+		// 查询用户是否点赞视频
 		if in.AllFavorite {
 			resList[i].IsFavorite = true
 		} else {
-			is, _ := l.svcCtx.Redis.Sismember(key, id)
+			is, _ := l.svcCtx.Redis.Sismember(key, vid)
 			resList[i].IsFavorite = is
 		}
 	}

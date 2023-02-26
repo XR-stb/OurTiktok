@@ -43,9 +43,7 @@ func (l *ActionLogic) Action(in *comment.ActionReq) (*comment.ActionRes, error) 
 
 		// 写入数据库
 		if err := l.svcCtx.DB.Create(&newComment).Error; err != nil {
-			return &comment.ActionRes{
-				Status: -1,
-			}, err
+			return &comment.ActionRes{Status: -1}, err
 		}
 
 		// 查询用户信息
@@ -59,10 +57,13 @@ func (l *ActionLogic) Action(in *comment.ActionReq) (*comment.ActionRes, error) 
 		}
 
 		// 写入缓存
+		// 更新评论信息
 		key := fmt.Sprintf("cinfo_%d", newComment.Id)
-		key2 := fmt.Sprintf("cids_%d", newComment.VideoId)
 		val := fmt.Sprintf("%d_%s", newComment.UserId, newComment.Content)
 		_ = l.svcCtx.Redis.Setex(key, val, 86400)
+
+		// 更新视频评论ID
+		key2 := fmt.Sprintf("cids_%d", newComment.VideoId)
 		_, _ = l.svcCtx.Redis.Zadd(key2, newComment.CreateTime, strconv.FormatInt(newComment.Id, 10))
 
 		return &comment.ActionRes{
@@ -84,9 +85,11 @@ func (l *ActionLogic) Action(in *comment.ActionReq) (*comment.ActionRes, error) 
 		}
 
 		// 更新缓存
+		// 更新评论信息
 		key := fmt.Sprintf("cinfo_%d", in.CommentId)
-		key2 := fmt.Sprintf("cids_%d", in.VideoId)
 		_, _ = l.svcCtx.Redis.Del(key)
+		// 更新视频评论ID
+		key2 := fmt.Sprintf("cids_%d", in.VideoId)
 		_, _ = l.svcCtx.Redis.Zrem(key2, in.CommentId)
 
 		return &comment.ActionRes{}, nil

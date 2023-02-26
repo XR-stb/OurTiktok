@@ -29,7 +29,9 @@ func NewGetUsersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUsers
 
 func (l *GetUsersLogic) GetUsers(in *user.GetUsersReq) (*user.GetUsersRes, error) {
 	users := make([]*user.UserInfo, 0, len(in.UserIds))
-	nonCacheList := make([]int64, 0, len(in.UserIds))
+
+	//从缓存中查询
+	nonCacheList := make([]int64, 0, len(in.UserIds)) //未命中列表
 	for _, id := range in.UserIds {
 		key := fmt.Sprintf("uinfo_%d", id)
 		val, err := l.svcCtx.Redis.Get(key)

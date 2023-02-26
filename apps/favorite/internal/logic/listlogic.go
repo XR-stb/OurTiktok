@@ -35,6 +35,7 @@ func (l *ListLogic) List(in *favorite.ListReq) (*favorite.ListRes, error) {
 	if err != nil || len(result) == 0 { // 未命中
 		// 查询数据库
 		l.svcCtx.DB.Table("favorites").Select("video_id").Where("user_id = ?", in.UserId).Find(&videoIds)
+		// 写回数据库
 		temp := make([]interface{}, len(videoIds), len(videoIds)+1)
 		for i, id := range videoIds {
 			temp[i] = id

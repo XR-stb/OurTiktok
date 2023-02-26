@@ -37,6 +37,7 @@ func (l *FollowListLogic) FollowList(in *relation.FollowListReq) (*relation.Foll
 	if err != nil || len(result) == 0 {
 		// 查询数据库
 		l.svcCtx.DB.Table("relations").Select("followed_id").Where("follower_id = ? AND status = ?", userId, 1).Find(&followIds)
+		// 写回数据库
 		temp := make([]interface{}, len(followIds), len(followIds)+1)
 		for i, id := range followIds {
 			temp[i] = id

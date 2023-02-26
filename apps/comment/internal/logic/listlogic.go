@@ -28,56 +28,57 @@ func NewListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListLogic {
 }
 
 func (l *ListLogic) List(in *comment.ListReq) (*comment.ListRes, error) {
+	// 获取评论ID
 	key := fmt.Sprintf("cids_%d", in.VideoId)
-	var commentList []*comment.CommentInfo
-	pairs, err := l.svcCtx.Redis.ZrevrangebyscoreWithScores(key, 0, math.MaxInt64)
-	if err != nil { // 缓存未命中
-		if err := l.svcCtx.DB.Table("comments").Where("video_id = ?", in.VideoId).Order("create_time desc").Find(&commentList).Error; err != nil {
-			return &comment.ListRes{}, nil
-		}
-	} else if len(pairs) == 0 { // 命中但为空
+	pairs, _ := l.svcCtx.Redis.ZrevrangebyscoreWithScores(key, 0, math.MaxInt64)
+	if len(pairs) == 0 {
 		return &comment.ListRes{}, nil
-	} else { // 命中
-		nonCacheList := make([]int64, 0, len(pairs))
-		commentList = make([]*comment.CommentInfo, len(pairs))
-		commentIds := make([]int64, len(pairs))
-		// 查询缓存
-		for i, pair := range pairs {
-			id, _ := strconv.ParseInt(pair.Key, 10, 64)
-			commentIds[i] = id
-			key := fmt.Sprintf("cinfo_%d", id)
-			str, err := l.svcCtx.Redis.Get(key)
-			if err != nil {
-				nonCacheList = append(nonCacheList, id)
-				continue
-			}
-			// 刷新过期时间
-			_ = l.svcCtx.Redis.Expire(key, 86400)
+	}
 
-			l.svcCtx.CommentCache[id] = parseToComment(id, pair.Score, str)
+	commentList := make([]*comment.CommentInfo, len(pairs))
+	nonCacheList := make([]int64, 0, len(pairs)) // 未命中列表
+	commentIds := make([]int64, len(pairs))
+	// 查询缓存
+	for i, pair := range pairs {
+		id, _ := strconv.ParseInt(pair.Key, 10, 64)
+		commentIds[i] = id
+		key := fmt.Sprintf("cinfo_%d", id)
+		str, err := l.svcCtx.Redis.Get(key)
+		if err != nil {
+			nonCacheList = append(nonCacheList, id)
+			continue
+		}
+		// 刷新过期时间
+		_ = l.svcCtx.Redis.Expire(key, 86400)
+
+		l.svcCtx.CommentCache[id] = parseToComment(id, pair.Score, str)
+	}
+
+	// 查询数据库
+	if len(nonCacheList) > 0 {
+		var queryCommentList []*comment.CommentInfo
+		l.svcCtx.DB.Table("comments").Where("id IN ?", nonCacheList)
+
+		for _, info := range queryCommentList {
+			l.svcCtx.CommentCache[info.Id] = info
 		}
 
-		// 查询数据库
-		if len(nonCacheList) > 0 {
-			var queryCommentList []*comment.CommentInfo
-			l.svcCtx.DB.Table("comments").Where("id IN ?", nonCacheList)
-
-			for _, info := range queryCommentList {
-				l.svcCtx.CommentCache[info.Id] = info
-			}
+		// 写回缓存
+		for _, info := range queryCommentList {
+			key := fmt.Sprintf("cinfo_%d", info.Id)
+			val := fmt.Sprintf("%d_%s", info.UserId, info.Content)
+			_ = l.svcCtx.Redis.Setex(key, val, 86400)
 		}
+	}
 
-		for i, id := range commentIds {
-			commentList[i] = l.svcCtx.CommentCache[id]
-		}
+	// 写入结果并获取评论用户ID
+	userIds := make([]int64, len(commentList))
+	for i, id := range commentIds {
+		commentList[i] = l.svcCtx.CommentCache[id]
+		userIds[i] = l.svcCtx.CommentCache[id].UserId
 	}
 
 	// 获取用户信息
-	userIds := make([]int64, len(commentList))
-	for i := 0; i < len(userIds); i++ {
-		userIds[i] = commentList[i].UserId
-	}
-
 	r, err := l.svcCtx.UserClient.GetUsers(context.Background(), &user.GetUsersReq{
 		UserIds: userIds,
 		ThisId:  in.UserId,

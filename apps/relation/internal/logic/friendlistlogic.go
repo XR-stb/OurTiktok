@@ -27,7 +27,7 @@ func NewFriendListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Friend
 
 // FriendList 获取好友列表
 func (l *FriendListLogic) FriendList(in *relation.FriendListReq) (*relation.FriendListRes, error) {
-	// 确认缓存
+	// 检查缓存
 	key1 := fmt.Sprintf("follow_%d", in.UserId)
 	key2 := fmt.Sprintf("fans_%d", in.UserId)
 
@@ -66,8 +66,9 @@ func (l *FriendListLogic) FriendList(in *relation.FriendListReq) (*relation.Frie
 
 	// 获取用户信息
 	if r, err := l.svcCtx.UserClient.GetUsers(context.Background(), &user.GetUsersReq{
-		UserIds: friendIds,
-		ThisId:  in.ThisId,
+		UserIds:   friendIds,
+		ThisId:    in.ThisId,
+		AllFollow: true,
 	}); err == nil {
 		for _, u := range r.Users {
 			l.svcCtx.UserCache[u.Id] = u

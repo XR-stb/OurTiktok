@@ -49,7 +49,8 @@ func (l *GetUserFavoriteLogic) GetUserFavorite(in *favorite.GetUserFavoriteReq) 
 		if err != nil {
 			continue
 		}
-		// 查询视频获赞
+
+		// 查询用户视频的获赞数量
 		var totalFavorited int64
 		for _, vid := range r.VideoIds {
 			// 查询缓存
@@ -59,6 +60,7 @@ func (l *GetUserFavoriteLogic) GetUserFavorite(in *favorite.GetUserFavoriteReq) 
 				// 查询数据库
 				var sqlCount int64
 				l.svcCtx.DB.Table("favorites").Where("video_id = ? AND status = ?", vid, 1).Count(&sqlCount)
+				// 写回缓存
 				_ = l.svcCtx.Redis.Setex(key, strconv.FormatInt(sqlCount, 10), 86400)
 				totalFavorited += sqlCount
 			} else {

@@ -79,9 +79,10 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 		if len(nonCacheList) > 0 {
 			var queryVideoList []*publish.Video
 			l.svcCtx.DB.Where("id IN ?", nonCacheList).Find(&queryVideoList)
+
 			for _, video := range queryVideoList {
 				l.svcCtx.VideoCache[video.Id] = video
-				// 写回数据库
+				// 写回缓存
 				key := fmt.Sprintf("vinfo_%d", video.Id)
 				val := fmt.Sprintf("%d_%s_%s_%s", video.AuthorId, video.PlayUrl, video.CoverUrl, video.Title)
 				_ = l.svcCtx.Redis.Setex(key, val, 86400)

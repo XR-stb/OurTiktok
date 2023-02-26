@@ -44,17 +44,14 @@ func (l *ActionLogic) Action(in *relation.ActionReq) (*relation.ActionRes, error
 		err = l.svcCtx.DB.Model(&relationModel).Where("followed_id=? AND follower_id=?", userId, thisId).Update("status", actionType).Error
 	}
 	if err != nil {
-		l.Error(err)
-		return &relation.ActionRes{
-			Status: -1,
-		}, err
+		return &relation.ActionRes{Status: -1}, err
 	}
 
-	// 更新缓存
+	// 更新缓存，如果不在缓存则不更新，依赖下一次查询
 	key := fmt.Sprintf("follow_%d", in.ThisId)
 	key2 := fmt.Sprintf("fans_%d", in.UserId)
 	if actionType == 1 {
-		if ttl, _ := l.svcCtx.Redis.Ttl(key); ttl > 0 { // 缓存存在->添加
+		if ttl, _ := l.svcCtx.Redis.Ttl(key); ttl > 0 {
 			_, _ = l.svcCtx.Redis.Sadd(key, in.UserId)
 		}
 		if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
