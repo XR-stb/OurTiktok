@@ -64,6 +64,9 @@ func initFeed(Redis *redis.Redis, DB *gorm.DB) {
 	}
 
 	_, err := Redis.Zadds("feed", pairs...)
+	if len(pairs) == 0 {
+		return
+	}
 	if err != nil {
 		panic("Make sure Redis alive")
 	}
