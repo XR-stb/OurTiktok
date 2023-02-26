@@ -13,8 +13,6 @@ type ServiceContext struct {
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config: c,
-		Redis: redis.New(c.Redis.Host, redis.Option(func(r *redis.Redis) {
-
-		})),
+		Redis:  redis.New(c.Redis.Host),
 	}
 }
