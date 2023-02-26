@@ -13,4 +13,5 @@ type Config struct {
 	Comment  zrpc.RpcClientConf
 	Relation zrpc.RpcClientConf
 	Feed     zrpc.RpcClientConf
+	Message  zrpc.RpcClientConf
 }
