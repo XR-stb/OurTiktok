@@ -8,6 +8,11 @@ enum Status {
   notOK = 1;
 }
 
+message LastMsg {
+  string message = 1;
+  int32 msgType = 2;
+}
+
 message MessageInfo {
   int64 Id = 1;
   int64 ToUserId = 2;
@@ -17,7 +22,7 @@ message MessageInfo {
 }
 
 message MessageActionReq {
-   int64 FromUserID = 1;
+   int64 FromUserId = 1;
    int64 ToUserId = 2;
    int32 ActionType = 3;
    string Content = 4;
@@ -28,7 +33,7 @@ message MessageActionRes {
 }
 
 message MessageChatReq {
-  int64 FromUserID = 1;
+  int64 FromUserId = 1;
   int64 ToUserId = 2;
   int64 PreMsgTime = 3;
 }
@@ -38,7 +43,17 @@ message MessageChatRes {
   repeated MessageInfo MessageList = 2;
 }
 
+message GetLastMsgReq {
+  int64 FromUserId = 1;
+  repeated int64 ToUserId = 2;
+}
+
+message GetLastMsgRes {
+  repeated LastMsg LastMsg = 1;
+}
+
 service Message {
   rpc Action(MessageActionReq) returns(MessageActionRes);
   rpc Chat(MessageChatReq) returns(MessageChatRes);
+  rpc GetLastMsg(GetLastMsgReq) returns(GetLastMsgRes);
 }

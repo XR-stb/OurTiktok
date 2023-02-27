@@ -27,7 +27,7 @@ func NewChatLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ChatLogic {
 }
 
 func (l *ChatLogic) Chat(in *message.MessageChatReq) (*message.MessageChatRes, error) {
-	key := fmt.Sprintf("chat:%d:%d", in.FromUserID, in.ToUserId)
+	key := fmt.Sprintf("chat:%d:%d", in.FromUserId, in.ToUserId)
 	chatKey, err := l.svcCtx.Redis.Get(key)
 	if err != nil {
 		return &message.MessageChatRes{Status: -1}, nil

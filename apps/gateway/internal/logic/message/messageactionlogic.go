@@ -39,7 +39,7 @@ func (l *MessageActionLogic) MessageAction(req *types.MessageActionReq) (resp *t
 	UserId = claims.UserId
 
 	r, err := l.svcCtx.MessageClient.Action(context.Background(), &message.MessageActionReq{
-		FromUserID: UserId,
+		FromUserId: UserId,
 		ToUserId:   req.ToUserId,
 		ActionType: req.ActionType,
 		Content:    req.Content,

@@ -29,15 +29,15 @@ func (l *ActionLogic) Action(in *message.MessageActionReq) (*message.MessageActi
 	now := time.Now().Unix()
 	first := false
 	// 获取ChatKey
-	key1 := fmt.Sprintf("chat:%d:%d", in.FromUserID, in.ToUserId)
+	key1 := fmt.Sprintf("chat:%d:%d", in.FromUserId, in.ToUserId)
 	chatKey, err := l.svcCtx.Redis.Get(key1)
 	if err != nil {
 		return &message.MessageActionRes{Status: -1}, nil
 	}
 	if chatKey == "" {
 		// 分配ChatKey
-		chatKey = fmt.Sprintf("msglist:%d:%d", in.FromUserID, in.ToUserId)
-		key2 := fmt.Sprintf("chat:%d:%d", in.ToUserId, in.FromUserID)
+		chatKey = fmt.Sprintf("msglist:%d:%d", in.FromUserId, in.ToUserId)
+		key2 := fmt.Sprintf("chat:%d:%d", in.ToUserId, in.FromUserId)
 		_ = l.svcCtx.Redis.Setex(key1, chatKey, 604800)
 		_ = l.svcCtx.Redis.Setex(key2, chatKey, 604800)
 		first = true
@@ -47,7 +47,7 @@ func (l *ActionLogic) Action(in *message.MessageActionReq) (*message.MessageActi
 	if err != nil {
 		return &message.MessageActionRes{Status: -1}, nil
 	}
-	msg := fmt.Sprintf("%d_%d_%d_%s", msgId, in.FromUserID, in.ToUserId, in.Content)
+	msg := fmt.Sprintf("%d_%d_%d_%s", msgId, in.FromUserId, in.ToUserId, in.Content)
 	_, _ = l.svcCtx.Redis.Zadd(chatKey, now, msg)
 	if first {
 		_ = l.svcCtx.Redis.Expire(chatKey, 604800)

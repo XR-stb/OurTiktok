@@ -13,6 +13,9 @@ import (
 )
 
 type (
+	GetLastMsgReq    = message.GetLastMsgReq
+	GetLastMsgRes    = message.GetLastMsgRes
+	LastMsg          = message.LastMsg
 	MessageActionReq = message.MessageActionReq
 	MessageActionRes = message.MessageActionRes
 	MessageChatReq   = message.MessageChatReq
@@ -22,6 +25,7 @@ type (
 	Message interface {
 		Action(ctx context.Context, in *MessageActionReq, opts ...grpc.CallOption) (*MessageActionRes, error)
 		Chat(ctx context.Context, in *MessageChatReq, opts ...grpc.CallOption) (*MessageChatRes, error)
+		GetLastMsg(ctx context.Context, in *GetLastMsgReq, opts ...grpc.CallOption) (*GetLastMsgRes, error)
 	}
 
 	defaultMessage struct {
@@ -43,4 +47,9 @@ func (m *defaultMessage) Action(ctx context.Context, in *MessageActionReq, opts 
 func (m *defaultMessage) Chat(ctx context.Context, in *MessageChatReq, opts ...grpc.CallOption) (*MessageChatRes, error) {
 	client := message.NewMessageClient(m.cli.Conn())
 	return client.Chat(ctx, in, opts...)
+}
+
+func (m *defaultMessage) GetLastMsg(ctx context.Context, in *GetLastMsgReq, opts ...grpc.CallOption) (*GetLastMsgRes, error) {
+	client := message.NewMessageClient(m.cli.Conn())
+	return client.GetLastMsg(ctx, in, opts...)
 }

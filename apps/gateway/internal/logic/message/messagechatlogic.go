@@ -40,7 +40,7 @@ func (l *MessageChatLogic) MessageChat(req *types.MessageChatReq) (resp *types.M
 	UserId = claims.UserId
 
 	r, err := l.svcCtx.MessageClient.Chat(context.Background(), &message.MessageChatReq{
-		FromUserID: UserId,
+		FromUserId: UserId,
 		ToUserId:   req.ToUserId,
 		PreMsgTime: req.PreMsgTime,
 	})

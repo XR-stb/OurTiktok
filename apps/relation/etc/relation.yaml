@@ -12,3 +12,6 @@ Consul:
 User:
   Target: consul://127.0.0.1:8500/user.rpc?wait=14s
   NonBlock: true
+Message:
+  Target: consul://127.0.0.1:8500/message.rpc?wait=14s
+  NonBlock: true

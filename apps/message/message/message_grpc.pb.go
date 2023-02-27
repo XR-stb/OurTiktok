@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type MessageClient interface {
 	Action(ctx context.Context, in *MessageActionReq, opts ...grpc.CallOption) (*MessageActionRes, error)
 	Chat(ctx context.Context, in *MessageChatReq, opts ...grpc.CallOption) (*MessageChatRes, error)
+	GetLastMsg(ctx context.Context, in *GetLastMsgReq, opts ...grpc.CallOption) (*GetLastMsgRes, error)
 }
 
 type messageClient struct {
@@ -52,12 +53,22 @@ func (c *messageClient) Chat(ctx context.Context, in *MessageChatReq, opts ...gr
 	return out, nil
 }
 
+func (c *messageClient) GetLastMsg(ctx context.Context, in *GetLastMsgReq, opts ...grpc.CallOption) (*GetLastMsgRes, error) {
+	out := new(GetLastMsgRes)
+	err := c.cc.Invoke(ctx, "/message.Message/GetLastMsg", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MessageServer is the server API for Message service.
 // All implementations must embed UnimplementedMessageServer
 // for forward compatibility
 type MessageServer interface {
 	Action(context.Context, *MessageActionReq) (*MessageActionRes, error)
 	Chat(context.Context, *MessageChatReq) (*MessageChatRes, error)
+	GetLastMsg(context.Context, *GetLastMsgReq) (*GetLastMsgRes, error)
 	mustEmbedUnimplementedMessageServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedMessageServer) Action(context.Context, *MessageActionReq) (*M
 }
 func (UnimplementedMessageServer) Chat(context.Context, *MessageChatReq) (*MessageChatRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Chat not implemented")
+}
+func (UnimplementedMessageServer) GetLastMsg(context.Context, *GetLastMsgReq) (*GetLastMsgRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLastMsg not implemented")
 }
 func (UnimplementedMessageServer) mustEmbedUnimplementedMessageServer() {}
 
@@ -120,6 +134,24 @@ func _Message_Chat_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Message_GetLastMsg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLastMsgReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServer).GetLastMsg(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/message.Message/GetLastMsg",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServer).GetLastMsg(ctx, req.(*GetLastMsgReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Message_ServiceDesc is the grpc.ServiceDesc for Message service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var Message_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Chat",
 			Handler:    _Message_Chat_Handler,
+		},
+		{
+			MethodName: "GetLastMsg",
+			Handler:    _Message_GetLastMsg_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
