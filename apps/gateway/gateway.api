@@ -49,6 +49,14 @@ type (
 		Message string `json:"message"`
 		MsgType int32  `json:"msg_type"`
 	}
+
+	Message {
+		Id         int64  `json:"id"`
+		ToUserId   int64  `json:"to_user_id"`
+		FromUserId int64  `json:"from_user_id"`
+		Content    string `json:"content"`
+		CreateTime int64  `json:"create_time"`
+	}
 )
 
 type (
@@ -302,4 +310,43 @@ service gateway-api {
 	
 	@handler RelationFriendListHandler
 	get /douyin/relation/friend/list (RelationFriendListReq) returns (RelationFriendListRes)
+}
+
+type (
+	MessageActionReq {
+		Token      string `form:"token"`
+		ToUserId   int64  `form:"to_user_id"`
+		ActionType int32  `form:"action_type"`
+		Content    string `form:"content"`
+	}
+
+	MessageActionRes {
+		Status
+	}
+
+	MessageChatReq {
+		Token      string `form:"token"`
+		ToUserId   int64  `form:"to_user_id"`
+		PreMsgTime int64  `form:"pre_msg_time"`
+	}
+
+	MessageChatRes {
+		Status
+		MessageList []Message `json:"message_list"`
+	}
+)
+
+@server (
+	group: message
+)
+service gateway-api {
+	@doc (
+		summary: "消息服务"
+	)
+	
+	@handler MessageActionHandler
+	post /douyin/message/action (MessageActionReq) returns (MessageActionRes)
+	
+	@handler MessageChatHandler
+	get /douyin/message/chat (MessageChatReq) returns (MessageChatRes)
 }

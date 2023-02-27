@@ -1,0 +1,10 @@
+Name: message.rpc
+ListenOn: 0.0.0.0:8083
+Log:
+  Encoding: plain
+  TimeFormat: 2006-01-02 15:04:05.00
+Consul:
+  Host: 127.0.0.1:8500
+  Key: message.rpc
+Redis:
+  Host: 127.0.0.1:6379

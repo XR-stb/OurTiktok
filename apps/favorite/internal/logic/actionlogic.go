@@ -1,13 +1,11 @@
 package logic
 
 import (
+	"OutTiktok/apps/favorite/favorite"
+	"OutTiktok/apps/favorite/internal/svc"
 	"OutTiktok/dao"
 	"context"
 	"fmt"
-	"strconv"
-
-	"OutTiktok/apps/favorite/favorite"
-	"OutTiktok/apps/favorite/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,7 +31,6 @@ func (l *ActionLogic) Action(in *favorite.ActionReq) (*favorite.ActionRes, error
 		UserId:  in.UserId,
 		Status:  in.ActionType,
 	}
-
 	var err error
 	if in.ActionType == 1 {
 		if err := l.svcCtx.DB.Create(&favoriteModel).Error; err != nil {
@@ -46,19 +43,10 @@ func (l *ActionLogic) Action(in *favorite.ActionReq) (*favorite.ActionRes, error
 		return &favorite.ActionRes{Status: -1}, err
 	}
 
-	// 更新缓存
+	// 更新缓存，如果不在缓存则不更新，依赖下一次查询
+	// 更新视频点赞数量
 	key := fmt.Sprintf("fc_%d", in.VideoId)
-	key2 := fmt.Sprintf("fv_%d", in.UserId)
-	res, err := l.svcCtx.Redis.Get(key)
-	if err != nil {
-		return &favorite.ActionRes{}, err
-	}
-
-	if res == "" {
-		var count int64
-		l.svcCtx.DB.Model(&favoriteModel).Where("video_id=?", in.VideoId).Count(&count)
-		_ = l.svcCtx.Redis.Setex(key, strconv.FormatInt(count, 10), 86400)
-	} else {
+	if ttl, _ := l.svcCtx.Redis.Ttl(key); ttl > 0 {
 		if in.ActionType == 1 {
 			_, _ = l.svcCtx.Redis.Incr(key)
 		} else {
@@ -67,16 +55,15 @@ func (l *ActionLogic) Action(in *favorite.ActionReq) (*favorite.ActionRes, error
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 	}
 
-	if in.ActionType == 1 {
-		if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
+	// 更新用户点赞视频
+	key2 := fmt.Sprintf("fv_%d", in.UserId)
+	if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
+		if in.ActionType == 1 {
 			_, _ = l.svcCtx.Redis.Sadd(key2, in.VideoId)
-		}
-	} else {
-		if ttl, _ := l.svcCtx.Redis.Ttl(key2); ttl > 0 {
+		} else {
 			_, _ = l.svcCtx.Redis.Srem(key2, in.VideoId)
 		}
 	}
-	_ = l.svcCtx.Redis.Expire(key2, 86400)
 
 	return &favorite.ActionRes{}, nil
 }

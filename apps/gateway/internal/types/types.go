@@ -44,6 +44,14 @@ type FriendUser struct {
 	MsgType int32  `json:"msg_type"`
 }
 
+type Message struct {
+	Id         int64  `json:"id"`
+	ToUserId   int64  `json:"to_user_id"`
+	FromUserId int64  `json:"from_user_id"`
+	Content    string `json:"content"`
+	CreateTime int64  `json:"create_time"`
+}
+
 type FeedReq struct {
 	LatestTime int64  `form:"latest_time,default=0"`
 	Token      string `form:"token"`
@@ -188,4 +196,26 @@ type RelationFriendListReq struct {
 type RelationFriendListRes struct {
 	Status
 	UserList []FriendUser `json:"user_list"`
+}
+
+type MessageActionReq struct {
+	Token      string `form:"token"`
+	ToUserId   int64  `form:"to_user_id"`
+	ActionType int32  `form:"action_type"`
+	Content    string `form:"content"`
+}
+
+type MessageActionRes struct {
+	Status
+}
+
+type MessageChatReq struct {
+	Token      string `form:"token"`
+	ToUserId   int64  `form:"to_user_id"`
+	PreMsgTime int64  `form:"pre_msg_time"`
+}
+
+type MessageChatRes struct {
+	Status
+	MessageList []Message `json:"message_list"`
 }

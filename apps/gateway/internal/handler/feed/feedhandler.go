@@ -2,6 +2,7 @@ package feed
 
 import (
 	"net/http"
+	"strconv"
 
 	"OutTiktok/apps/gateway/internal/logic/feed"
 	"OutTiktok/apps/gateway/internal/svc"
@@ -12,11 +13,8 @@ import (
 func FeedHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.FeedReq
-		//if err := httpx.Parse(r, &req); err != nil {
-		//	httpx.ErrorCtx(r.Context(), w, err)
-		//	return
-		//}
-		_ = httpx.Parse(r, &req)
+		req.Token = r.FormValue("token")
+		req.LatestTime, _ = strconv.ParseInt(r.FormValue("latest_time"), 10, 64)
 
 		l := feed.NewFeedLogic(r.Context(), svcCtx)
 		resp, err := l.Feed(&req)

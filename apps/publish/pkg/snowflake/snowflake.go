@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	epoch          = int64(1400000000000)              // 设置起始时间
-	timestampBits  = uint(41)                          // 时间戳占用位数
-	workeridBits   = uint(10)                          // 机器id所占位数
-	sequenceBits   = uint(12)                          // 序列所占的位数
-	timestampMax   = int64(-1 ^ (-1 << timestampBits)) // 时间戳最大值
-	workeridMax    = int64(-1 ^ (-1 << workeridBits))  // 支持的最大机器id数量
-	sequenceMask   = int64(-1 ^ (-1 << sequenceBits))  // 支持的最大序列id数量
-	workeridShift  = sequenceBits                      // 机器id左移位数
-	timestampShift = sequenceBits + workeridBits       // 时间戳左移位数
+	epoch         = int64(1400000000000)              // 设置起始时间
+	timestampBits = uint(41)                          // 时间戳占用位数
+	workerIdBits  = uint(10)                          // 机器id所占位数
+	sequenceBits  = uint(12)                          // 序列所占的位数
+	timestampMax  = int64(-1 ^ (-1 << timestampBits)) // 时间戳最大值
+	//workeridMax    = int64(-1 ^ (-1 << workerIdBits))  // 支持的最大机器id数量
+	sequenceMask   = int64(-1 ^ (-1 << sequenceBits)) // 支持的最大序列id数量
+	workerIdShift  = sequenceBits                     // 机器id左移位数
+	timestampShift = sequenceBits + workerIdBits      // 时间戳左移位数
 )
 
 type Snowflake struct {
@@ -45,7 +45,7 @@ func (s *Snowflake) New() string {
 	}
 	s.lasttimestamp = now
 	s.Unlock()
-	shift := int64((t)<<timestampShift | (s.workerid << workeridShift) | (s.sequence))
+	shift := (t)<<timestampShift | (s.workerid << workerIdShift) | (s.sequence)
 	res := strconv.FormatInt(shift, 10)
 	return res
 }

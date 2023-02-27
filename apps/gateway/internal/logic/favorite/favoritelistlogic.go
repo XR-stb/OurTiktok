@@ -32,12 +32,9 @@ func (l *FavoriteListLogic) FavoriteList(req *types.FavoriteListReq) (resp *type
 	// 验证Token
 	var thisId int64
 	claims, err := jwt.VerifyToken(req.Token)
-	if err != nil {
-		resp.StatusCode = -1
-		resp.StatusMsg = err.Error()
-		return
+	if err == nil {
+		thisId = claims.UserId
 	}
-	thisId = claims.UserId
 
 	r, err := l.svcCtx.FavoriteClient.List(context.Background(), &favorite.ListReq{
 		UserId: req.UserId,
