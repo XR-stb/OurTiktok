@@ -1,4 +1,5 @@
 FROM alpine:latest
+FROM linuxserver/ffmpeg:latest
 MAINTAINER baytan
 
 WORKDIR /
