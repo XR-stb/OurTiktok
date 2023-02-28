@@ -4,6 +4,10 @@ Log:
   Encoding: plain
   TimeFormat: 2006-01-02 15:04:05.00
   Level: error
+Prometheus:
+  Host: 0.0.0.0
+  Port: 7082
+  Path: /metrics
 Consul:
   Host: consul:8500
   Key: feed.rpc

@@ -4,6 +4,10 @@ Log:
   Encoding: plain
   TimeFormat: 2006-01-02 15:04:05.00
   Level: error
+Prometheus:
+  Host: 0.0.0.0
+  Port: 7080
+  Path: /metrics
 MysqlDsn: root:123456@tcp(mysql:3306)/douyin?charset=utf8&parseTime=True&loc=Local
 Redis:
   Host: redis:6379
