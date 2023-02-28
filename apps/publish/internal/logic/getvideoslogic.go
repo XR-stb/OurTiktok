@@ -47,7 +47,8 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 		// 刷新过期时间
 		_ = l.svcCtx.Redis.Expire(key, 86400)
 
-		l.svcCtx.VideoCache[id] = parseToVideo(id, result)
+		//l.svcCtx.VideoCache[id] = parseToVideo(id, result)
+		l.svcCtx.VideoCache.Store(id, parseToVideo(id, result))
 	}
 
 	// 查询数据库
@@ -55,7 +56,8 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 		var queryVideoList []*publish.Video
 		l.svcCtx.DB.Where("id IN ?", nonCacheList).Find(&queryVideoList)
 		for _, video := range queryVideoList {
-			l.svcCtx.VideoCache[video.Id] = video
+			//l.svcCtx.VideoCache[video.Id] = video
+			l.svcCtx.VideoCache.Store(video.Id, video)
 			// 写回数据库
 			key := fmt.Sprintf("vinfo_%d", video.Id)
 			val := fmt.Sprintf("%d_%s_%s_%s", video.AuthorId, video.PlayUrl, video.CoverUrl, video.Title)
@@ -67,7 +69,9 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 	videoList := make([]*publish.Video, len(videoIds))
 	AuthorIds := make([]int64, 0, len(videoIds))
 	for i, id := range videoIds {
-		v := l.svcCtx.VideoCache[id]
+		//v := l.svcCtx.VideoCache[id]
+		val, _ := l.svcCtx.VideoCache.Load(id)
+		v := val.(*publish.Video) //转型一下
 		videoList[i] = v
 		AuthorIds = append(AuthorIds, v.AuthorId)
 	}
@@ -81,10 +85,12 @@ func (l *GetVideosLogic) GetVideos(in *publish.GetVideosReq) (*publish.GetVideos
 		UserIds: AuthorIds,
 	}); err == nil {
 		for _, user := range r.Users {
-			l.svcCtx.UserCache[user.Id] = user
+			//l.svcCtx.UserCache[user.Id] = user
+			l.svcCtx.UserCache.Store(user.Id, user)
 		}
 		for i := 0; i < len(videoList); i++ {
-			userinfo := l.svcCtx.UserCache[videoList[i].AuthorId]
+			//userinfo := l.svcCtx.UserCache[videoList[i].AuthorId]
+			userinfo, _ := l.svcCtx.UserCache.Load(videoList[i].AuthorId)
 			videoList[i].Author = &publish.UserInfo{}
 			_ = copier.Copy(videoList[i].Author, userinfo)
 		}
