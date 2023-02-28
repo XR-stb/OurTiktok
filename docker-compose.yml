@@ -1,0 +1,230 @@
+#file: noinspection SpellCheckingInspection
+version: '3.8'
+# 网络配置
+networks:
+  backend:
+    driver: ${NETWORKS_DRIVER}
+
+# 服务容器配置
+services:
+  mysql:
+    image: mysql
+    environment:
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}    # 设置 Mysql root 用户密码
+    volumes:
+      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql        # 引用 .env 配置中 DATA_PATH_HOST 变量，将宿主机上存放 Mysql 数据的目录挂载到容器中 /var/lib/mysql 目录
+    ports:
+      - "${MYSQL_PORT}:3306"                          # 设置容器3306端口映射指定宿主机端口
+    networks:
+      - backend
+    restart: always
+
+  redis:
+    image: redis
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${DATA_PATH_HOST}/redis:/data                 # 引用 .env 配置中 DATA_PATH_HOST 变量，将宿主机上存放 Redis 数据的目录挂载到容器中 /data 目录
+    ports:
+      - "${REDIS_PORT}:6379"                          # 设置容器6379端口映射指定宿主机端口
+    networks:
+      - backend
+    restart: always
+
+  prometheus:
+    image: prom/prometheus
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ./prometheus/prometheus.yml:/opt/bitnami/prometheus/conf/prometheus.yml  # 将 prometheus 配置文件挂载到容器里
+    ports:
+      - "${PROMETHEUS_PORT}:9090"                     # 用于宿主机访问可视化web
+    networks:
+      - backend
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    environment:
+      - TZ=${TZ}
+    ports:
+      - "${GRAFANA_PORT}:3000"                        # 用于宿主机访问可视化web
+    networks:
+      - backend
+    restart: always
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    environment:
+      - TZ=${TZ}
+    ports:
+      - "${JAEGER_PORT}:16686"                        # 用于宿主机访问可视化web
+    networks:
+      - backend
+    restart: always
+
+  minio:
+    image: minio/minio
+    command: server --console-address ":9090" -address ":9000" /data
+    environment:
+      - TZ=${TZ}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+    volumes:
+      - ${DATA_PATH_HOST}/minio/data:/data
+      - ${DATA_PATH_HOST}/minio/config:/root/.minio
+    ports:
+      - "${MINIO_CONSOLE_PORT}:9090"                          # 用于宿主机访问Minio Console
+      - "${MINIO_API_PORT}:9000"                              # 用于宿主机访问Minio Api
+    restart: always
+
+  consul:
+    image: consul:latest
+    environment:
+      - TZ=${TZ}
+    ports:
+      - "8500:8500"
+    networks:
+      - backend
+    restart: always
+
+  user:
+    build:
+      context: ./apps/user
+    environment:
+      - TZ=${TZ}
+    links:
+      - mysql
+      - redis
+      - consul
+    depends_on:
+      - mysql
+      - redis
+      - consul
+    networks:
+      - backend
+    restart: always
+
+  publish:
+    build:
+      context: ./apps/publish
+    environment:
+      - TZ=${TZ}
+    links:
+      - mysql
+      - redis
+      - consul
+      - minio
+    depends_on:
+      - mysql
+      - redis
+      - consul
+      - minio
+    networks:
+      - backend
+    restart: always
+
+  favorite:
+    build:
+      context: ./apps/favorite
+    environment:
+      - TZ=${TZ}
+    links:
+      - mysql
+      - redis
+      - consul
+    depends_on:
+      - mysql
+      - redis
+      - consul
+    networks:
+      - backend
+    restart: always
+
+  feed:
+    build:
+      context: ./apps/feed
+    environment:
+      - TZ=${TZ}
+    links:
+      - mysql
+      - redis
+      - consul
+    depends_on:
+      - mysql
+      - redis
+      - consul
+    networks:
+      - backend
+    restart: always
+
+  comment:
+    build:
+      context: ./apps/comment
+    environment:
+      - TZ=${TZ}
+    links:
+      - mysql
+      - redis
+      - consul
+    depends_on:
+      - mysql
+      - redis
+      - consul
+    networks:
+      - backend
+    restart: always
+
+  relation:
+    build:
+      context: ./apps/relation
+    environment:
+      - TZ=${TZ}
+    links:
+      - mysql
+      - redis
+      - consul
+    depends_on:
+      - mysql
+      - redis
+      - consul
+    networks:
+      - backend
+    restart: always
+
+  message:
+    build:
+      context: ./apps/message
+    environment:
+      - TZ=${TZ}
+    links:
+      - mysql
+      - redis
+      - consul
+    depends_on:
+      - mysql
+      - redis
+      - consul
+    networks:
+      - backend
+    restart: always
+
+  gateway:
+    build:
+      context: ./apps/gateway
+    environment:
+      - TZ=${TZ}
+    links:
+      - mysql
+      - redis
+      - consul
+    depends_on:
+      - mysql
+      - redis
+      - consul
+    networks:
+      - backend
+    ports:
+      - "${GATEWAY_PORT}:8888"
+    restart: always

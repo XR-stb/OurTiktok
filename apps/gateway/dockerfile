@@ -1,0 +1,7 @@
+FROM alpine:latest
+MAINTAINER baytan
+
+WORKDIR /
+COPY main .
+COPY etc/gateway-api.yaml /etc
+CMD ["./main"]
