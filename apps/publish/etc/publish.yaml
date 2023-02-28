@@ -15,7 +15,8 @@ MysqlDsn: root:123456@tcp(mysql:3306)/douyin?charset=utf8&parseTime=True&loc=Loc
 Redis:
   Host: redis:6379
 Minio:
-  Host: 192.168.31.193:9000
+  Host: minio:9000
+  Expose: 192.168.31.193:9000
   AccessKey: admin
   SecretKey: admin123
   VideoBucket: videos

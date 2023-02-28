@@ -13,6 +13,7 @@ type Config struct {
 	Redis    redis.RedisConf
 	Minio    struct {
 		Host        string
+		Expose      string
 		AccessKey   string
 		SecretKey   string
 		VideoBucket string

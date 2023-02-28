@@ -39,6 +39,7 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 	// 上传视频
 	reader := bytes.NewReader(in.Data)
 	if _, err := l.svcCtx.Minio.PutObject(l.svcCtx.Config.Minio.VideoBucket, filename+".mp4", reader, reader.Size(), minio.PutObjectOptions{ContentType: "video/mp4"}); err != nil {
+		l.Error(err)
 		return &publish.ActionRes{Status: -1}, nil
 	}
 
@@ -59,11 +60,12 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 	video := dao.Video{
 		AuthorId:   in.UserId,
 		UploadTime: time.Now().UnixMilli(),
-		PlayUrl:    "http://" + l.svcCtx.Config.Minio.Host + "/videos/" + filename + ".mp4",
-		CoverUrl:   "http://" + l.svcCtx.Config.Minio.Host + "/covers/" + filename + ".jpg",
+		PlayUrl:    "http://" + l.svcCtx.Config.Minio.Expose + "/videos/" + filename + ".mp4",
+		CoverUrl:   "http://" + l.svcCtx.Config.Minio.Expose + "/covers/" + filename + ".jpg",
 		Title:      in.Title,
 	}
-	if l.svcCtx.DB.Create(&video).Error != nil {
+	if err := l.svcCtx.DB.Create(&video).Error; err != nil {
+		l.Error(err)
 		return &publish.ActionRes{Status: -1}, nil
 	}
 

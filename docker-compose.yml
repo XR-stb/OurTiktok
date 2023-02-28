@@ -78,6 +78,8 @@ services:
       - "${MINIO_CONSOLE_PORT}:9090"                          # 用于宿主机访问Minio Console
       - "${MINIO_API_PORT}:9000"                              # 用于宿主机访问Minio Api
     restart: always
+    networks:
+      - backend
 
   consul:
     image: consul:latest
