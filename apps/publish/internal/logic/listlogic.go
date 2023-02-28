@@ -72,7 +72,8 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 			}
 			_ = l.svcCtx.Redis.Expire(key, 86400)
 
-			l.svcCtx.VideoCache[id] = parseToVideo(id, str)
+			//l.svcCtx.VideoCache[id] = parseToVideo(id, str)
+			l.svcCtx.VideoCache.Store(id, parseToVideo(id, str))
 		}
 
 		// 查询数据库
@@ -81,7 +82,8 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 			l.svcCtx.DB.Where("id IN ?", nonCacheList).Find(&queryVideoList)
 
 			for _, video := range queryVideoList {
-				l.svcCtx.VideoCache[video.Id] = video
+				//l.svcCtx.VideoCache[video.Id] = video
+				l.svcCtx.VideoCache.Store(video.Id, video)
 				// 写回缓存
 				key := fmt.Sprintf("vinfo_%d", video.Id)
 				val := fmt.Sprintf("%d_%s_%s_%s", video.AuthorId, video.PlayUrl, video.CoverUrl, video.Title)
@@ -92,7 +94,10 @@ func (l *ListLogic) List(in *publish.ListReq) (*publish.ListRes, error) {
 		// 写入结果
 		videoList = make([]*publish.Video, len(videoIds))
 		for i, id := range videoIds {
-			videoList[i] = l.svcCtx.VideoCache[id]
+			//videoList[i] = l.svcCtx.VideoCache[id]
+			val, _ := l.svcCtx.VideoCache.Load(id)
+			v := val.(*publish.Video) //转型一下
+			videoList[i] = v
 		}
 	}
 
