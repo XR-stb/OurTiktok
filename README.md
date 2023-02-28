@@ -40,19 +40,27 @@
 
 ## 部署项目-Docker
 
-拉取项目到本地
+1. 拉取项目到本地
 
 ```shell
 git clone https://github.com/XR-stb/OurTiktok.git
 ```
 
-确保已经安装Docker、Docker-Compose，在项目根目录运行
+2. 配置apps/publish/etc/publish.yaml中Minio--Expose为本机IP
 
+3. 编译所有项目代码
+
+```shell
+make
 ```
+
+4. 确保已经安装Docker、Docker-Compose，在项目根目录运行
+
+```shell
 docker-compose up
 ```
 
-项目会自动部署并运行，访问`127.0.0.1:3000`，点击上方的status-targets，可以看到服务的上线情况
+5. 项目会自动部署并运行，访问`127.0.0.1:3000`，点击上方的status-targets，可以看到服务的上线情况
 
 ![架构图](https://github.com/XR-stb/OurTiktok/blob/main/docs/服务上线.png)
 
