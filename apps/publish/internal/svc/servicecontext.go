@@ -7,7 +7,6 @@ import (
 	"OutTiktok/apps/favorite/favoriteclient"
 	"OutTiktok/apps/publish/internal/config"
 	"OutTiktok/apps/publish/pkg/snowflake"
-	"OutTiktok/apps/publish/publish"
 	"OutTiktok/apps/user/user"
 	"OutTiktok/apps/user/userclient"
 	"OutTiktok/dao"
@@ -16,6 +15,7 @@ import (
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 	"gorm.io/gorm"
+	"sync"
 )
 
 type ServiceContext struct {
@@ -27,8 +27,8 @@ type ServiceContext struct {
 	UserClient     user.UserClient
 	FavoriteClient favorite.FavoriteClient
 	CommentClient  comment.CommentClient
-	UserCache      map[int64]*userclient.UserInfo
-	VideoCache     map[int64]*publish.Video
+	UserCache      sync.Map
+	VideoCache     sync.Map
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -45,7 +45,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		UserClient:     userclient.NewUser(zrpc.MustNewClient(c.User, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
 		FavoriteClient: favoriteclient.NewFavorite(zrpc.MustNewClient(c.Favorite, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
 		CommentClient:  commentclient.NewComment(zrpc.MustNewClient(c.Comment, zrpc.WithDialOption(grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`)))),
-		UserCache:      map[int64]*userclient.UserInfo{},
-		VideoCache:     map[int64]*publish.Video{},
+		UserCache:      sync.Map{},
+		VideoCache:     sync.Map{},
 	}
 }
