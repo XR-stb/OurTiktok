@@ -46,7 +46,7 @@ func (l *ActionLogic) Action(in *publish.ActionReq) (*publish.ActionRes, error) 
 	// 异步生成封面
 	go func() {
 		// 视频链接
-		playUrl := "http://" + l.svcCtx.Config.Minio.Host + "/videos/" + filename + ".mp4"
+		playUrl := "http://" + l.svcCtx.Config.Minio.Expose + "/videos/" + filename + ".mp4"
 
 		// 获取封面
 		coverData, _ := readFrameAsJpeg(playUrl)
