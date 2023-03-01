@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"OutTiktok/apps/message/message"
 	"OutTiktok/apps/relation/internal/svc"
 	"OutTiktok/apps/relation/relation"
 	"OutTiktok/apps/user/user"
@@ -48,8 +49,7 @@ func (l *FriendListLogic) FriendList(in *relation.FriendListReq) (*relation.Frie
 	_ = l.svcCtx.Redis.Expire(key2, 86400)
 
 	var friendIds []int64
-	result, err := l.svcCtx.Redis.Sinter(key1, key2)
-	if err != nil || len(result) == 0 {
+	if result, err := l.svcCtx.Redis.Sinter(key1, key2); err != nil || len(result) == 0 {
 		return &relation.FriendListRes{Status: -1}, nil
 	} else if len(result) == 1 {
 		return &relation.FriendListRes{}, nil
@@ -79,6 +79,17 @@ func (l *FriendListLogic) FriendList(in *relation.FriendListReq) (*relation.Frie
 	for i, id := range friendIds {
 		users[i] = &relation.FriendUser{}
 		_ = copier.Copy(users[i], l.svcCtx.UserCache[id])
+	}
+
+	// 获取最后一条消息
+	if r, err := l.svcCtx.MessageClient.GetLastMsg(context.Background(), &message.GetLastMsgReq{
+		FromUserId: in.ThisId,
+		ToUserId:   friendIds,
+	}); err == nil {
+		for i, msg := range r.LastMsg {
+			users[i].MsgType = msg.MsgType
+			users[i].Message = msg.Message
+		}
 	}
 
 	return &relation.FriendListRes{

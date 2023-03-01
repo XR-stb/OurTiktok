@@ -1,0 +1,65 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+
+rule_files:
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: 'OurTiktok'
+    static_configs:
+      - targets: ['gateway:7888']
+        labels:
+          job: 'gateway'
+          app: 'gateway-api'
+          env: 'dev'
+          instance: '127.0.0.1:8888'
+
+      - targets: ['comment:7080']
+        labels:
+          job: 'comment'
+          app: 'comment-rpc'
+          env: 'dev'
+
+      - targets: ['favorite:7081']
+        labels:
+          job: 'favorite'
+          app: 'favorite-rpc'
+          env: 'dev'
+
+      - targets: ['feed:7082']
+        labels:
+          job: 'feed'
+          app: 'feed-rpc'
+          env: 'dev'
+
+      - targets: ['message:7083']
+        labels:
+          job: 'message'
+          app: 'message-rpc'
+          env: 'dev'
+
+      - targets: ['publish:7084']
+        labels:
+          job: 'publish'
+          app: 'publish-rpc'
+          env: 'dev'
+
+      - targets: ['relation:7085']
+        labels:
+          job: 'relation'
+          app: 'relation-rpc'
+          env: 'dev'
+
+      - targets: ['user:7086']
+        labels:
+          job: 'user'
+          app: 'user-rpc'
+          env: 'dev'

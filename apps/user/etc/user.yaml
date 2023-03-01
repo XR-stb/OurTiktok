@@ -3,20 +3,25 @@ ListenOn: 0.0.0.0:8086
 Log:
   Encoding: plain
   TimeFormat: 2006-01-02 15:04:05.00
+  Level: error
+Prometheus:
+  Host: 0.0.0.0
+  Port: 7086
+  Path: /metrics
 Consul:
-  Host: 127.0.0.1:8500
+  Host: consul:8500
   Key: user.rpc
-MysqlDsn: root:baytan123@tcp(127.0.0.1:3306)/fakedouyin?charset=utf8&parseTime=True&loc=Local
+MysqlDsn: root:123456@tcp(mysql:3306)/douyin?charset=utf8&parseTime=True&loc=Local
 Redis:
-  Host: 127.0.0.1:6379
+  Host: redis:6379
 Minio:
   Host: 116.62.164.8:9000
 Publish:
-  Target: consul://127.0.0.1:8500/publish.rpc?wait=14s
+  Target: consul://consul:8500/publish.rpc?wait=14s
   NonBlock: true
 Favorite:
-  Target: consul://127.0.0.1:8500/favorite.rpc?wait=14s
+  Target: consul://consul:8500/favorite.rpc?wait=14s
   NonBlock: true
 Relation:
-  Target: consul://127.0.0.1:8500/relation.rpc?wait=14s
+  Target: consul://consul:8500/relation.rpc?wait=14s
   NonBlock: true

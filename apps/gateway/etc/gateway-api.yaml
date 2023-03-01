@@ -4,24 +4,28 @@ Port: 8888
 Log:
   Encoding: plain
   TimeFormat: 2006-01-02 15:04:05.00
+Prometheus:
+  Host: 0.0.0.0
+  Port: 7888
+  Path: /metrics
 User:
-  Target: consul://127.0.0.1:8500/user.rpc?wait=14s
+  Target: consul://consul:8500/user.rpc?wait=14s
   NonBlock: true
 Publish:
-  Target: consul://127.0.0.1:8500/publish.rpc?wait=14s
+  Target: consul://consul:8500/publish.rpc?wait=14s
   NonBlock: true
 Favorite:
-  Target: consul://127.0.0.1:8500/favorite.rpc?wait=14s
+  Target: consul://consul:8500/favorite.rpc?wait=14s
   NonBlock: true
 Comment:
-  Target: consul://127.0.0.1:8500/comment.rpc?wait=14s
+  Target: consul://consul:8500/comment.rpc?wait=14s
   NonBlock: true
 Relation:
-  Target: consul://127.0.0.1:8500/relation.rpc?wait=14s
+  Target: consul://consul:8500/relation.rpc?wait=14s
   NonBlock: true
 Feed:
-  Target: consul://127.0.0.1:8500/feed.rpc?wait=14s
+  Target: consul://consul:8500/feed.rpc?wait=14s
   NonBlock: true
 Message:
-  Target: consul://127.0.0.1:8500/message.rpc?wait=14s
+  Target: consul://consul:8500/message.rpc?wait=14s
   NonBlock: true

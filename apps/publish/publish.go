@@ -39,6 +39,10 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
+	// 设置最大消息大小
+	maxSize := 20 * 1024 * 1024
+	s.AddOptions(grpc.MaxRecvMsgSize(maxSize))
+
 	//将 rpc注册到consul
 	err := consul.RegisterService(c.ListenOn, c.Consul)
 	if err != nil {

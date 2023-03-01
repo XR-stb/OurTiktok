@@ -38,65 +38,35 @@
 7. 关注Follow：关注用户、取消关注、关注列表
 8. 消息Message：发送消息、接收消息
 
-## 启动项目
+## 部署项目-Docker
 
-启动Consul、Mysql、Redis、Minio并进行配置
-
-```shell
-consul agent -dev
-```
-
-启动Feed服务  
+1. 拉取项目到本地
 
 ```shell
-cd apps/feed && go run feed.go
+git clone https://github.com/XR-stb/OurTiktok.git
 ```
 
-启动Publish服务
+2. 配置apps/publish/etc/publish.yaml中Minio--Expose为本机IP
+
+3. 编译所有项目代码
 
 ```shell
-cd apps/feed && go run publish.go
+make
 ```
 
-启动User服务
+4. 确保已经安装Docker、Docker-Compose，在项目根目录运行
 
 ```shell
-cd apps/user && go run user.go
+docker-compose up
 ```
 
-启动Favorite服务
+5. 项目会自动部署并运行，访问`127.0.0.1:3000`，点击上方的status-targets，可以看到服务的上线情况
 
-```shell
-cd apps/favorite && go run favorite.go
-```
-
-启动Comment服务
-
-```shell
-cd apps/comment && go run comment.go
-```
-
-启动Relation服务
-
-```shell
-cd apps/relation && go run relation.go
-```
-
-启动Message服务
-
-```shell
-cd apps/message && go run message.go
-```
-
-启动Gateway
-
-```shell
-cd apps/gateway && go run gateway.go
-```
+![架构图](https://github.com/XR-stb/OurTiktok/blob/main/docs/服务上线.png)
 
 ## TODO
 1. 使用Nacos作为配置中心，简化配置步骤
-2. 使用Prometheus作为服务监控
+2. 使用Prometheus作为服务监控✅
 3. 使用Jaeger作为链路追踪
 4. 开发后台管理系统（待定）
-5. Docker部署（待定）
+5. Docker部署✅

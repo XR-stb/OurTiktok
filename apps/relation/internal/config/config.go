@@ -10,6 +10,7 @@ type Config struct {
 	zrpc.RpcServerConf
 	Consul   consul.Conf
 	User     zrpc.RpcClientConf
+	Message  zrpc.RpcClientConf
 	Redis    redis.RedisConf
 	MysqlDsn string
 }
