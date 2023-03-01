@@ -8,6 +8,11 @@ Prometheus:
   Host: 0.0.0.0
   Port: 7085
   Path: /metrics
+Telemetry:
+  Name: relation.rpc
+  Endpoint: http://jaeger:14268/api/traces
+  Sampler: 1.0
+  Batcher: jaeger
 MysqlDsn: root:123456@tcp(mysql:3306)/douyin?charset=utf8&parseTime=True&loc=Local
 Redis:
   Host: redis:6379
