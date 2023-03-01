@@ -2,6 +2,8 @@
 
 第五届字节跳动青训营大项目，实现极简版抖音后台
 
+项目说明文档：https://bytedancecampus1.feishu.cn/docx/FwmMd3SV7ojWarxA1edc9DgXnHb
+
 ## 技术栈
 
 该项目使用Go语言进行开发，Go-zero作为微服务框架
