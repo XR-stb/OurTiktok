@@ -4,6 +4,11 @@ Log:
   Encoding: plain
   TimeFormat: 2006-01-02 15:04:05.00
   Level: error
+Telemetry:
+  Name: comment.rpc
+  Endpoint: http://jaeger:14268/api/traces
+  Sampler: 1.0
+  Batcher: jaeger
 Prometheus:
   Host: 0.0.0.0
   Port: 7080

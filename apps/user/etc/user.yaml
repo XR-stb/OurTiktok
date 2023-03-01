@@ -8,6 +8,11 @@ Prometheus:
   Host: 0.0.0.0
   Port: 7086
   Path: /metrics
+Telemetry:
+  Name: user.rpc
+  Endpoint: http://jaeger:14268/api/traces
+  Sampler: 1.0
+  Batcher: jaeger
 Consul:
   Host: consul:8500
   Key: user.rpc
